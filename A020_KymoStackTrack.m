@@ -57,25 +57,41 @@ else                                %make two kymographs
 end
 
 %% 2 do peak analysis on each profile of the kymographs
-[posses_DNA,kymo_DNA_cln]=PeakFit_kymo(kymo_DNA);
-[posses_Cnd,kymo_Cnd_cln]=PeakFit_kymo(kymo_Cnd);
+posses_Cnd=PeakFit_kymo(kymo_Cnd,'flatbottom',4);
+%posses_DNA=PeakFit_kymo(kymo_DNA,'edgedetect',3);
+posses_DNA=PeakFit_kymo(kymo_DNA,'peeling',3);
 
 %% show result
 figure(1);
 if sho
+    [rrc,ccc]=size(kymo_Cnd);
+    [rrd,ccd]=size(kymo_DNA);
     subplot(2,2,1); pcolor(kymo_Cnd); shading flat, colormap hot;
+    title('Condensin'); ylabel('frame no.');
     subplot(2,2,2); pcolor(kymo_DNA); shading flat, colormap hot;
-    subplot(2,2,3); pcolor(kymo_Cnd_cln); shading flat, colormap hot; hold on;
-    subplot(2,2,4); pcolor(kymo_DNA_cln); shading flat, colormap hot; hold on;    
-    subplot(2,2,3); plot(posses_Cnd(:,2),posses_Cnd(:,1),'wx', 'MarkerSize',1);
-    subplot(2,2,4); plot(posses_DNA(:,2),posses_DNA(:,1),'wx','MarkerSize',1);
+    title('DNA'); ylabel('frame no.');
+    subplot(2,2,3); plot(posses_Cnd(:,2),posses_Cnd(:,1),'ko', 'MarkerSize',2);
+    xlabel('position'); ylabel('frame no.');
+    xlim([1 ccc]); ylim([1 rrc]);
+    subplot(2,2,4); plot(posses_DNA(:,2),posses_DNA(:,1),'ko','MarkerSize',2);
+    xlabel('position'); ylabel('frame no.');
+    xlim([1 ccd]); ylim([1 rrd]);
 end
 
+figure(2);
+shiftX=-10;
+
+plot(posses_DNA(:,3)+shiftX,posses_DNA(:,1),'co','MarkerSize',2); hold on;
+plot(posses_DNA(:,2)+shiftX,posses_DNA(:,1),'bo','MarkerSize',3); hold on;
+
+%plot(posses_Cnd(:,3),posses_Cnd(:,1),'mo', 'MarkerSize',2); hold on;
+plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',3); hold on;
+legend('DNA-1st','DNA-2nd','Condensin-2nd');
+xlim([1 ccd]); ylim([1 rrd]);
 %% save data
 SaveName=char(strcat(generaldatapth, Exp,Expi));
 save(strcat(SaveName, '_allresults.mat'),... 
             'kymo_Cnd',     'kymo_DNA',...
-            'kymo_Cnd_cln','kymo_DNA_cln',...
             'posses_Cnd','posses_DNA');
 end
 
@@ -97,14 +113,50 @@ function kymo=Build_kymo(pth)
     end
     
     
-function [posses,cleankymo]=PeakFit_kymo(kymo);
+function posses=PeakFit_kymo(kymo,peakfitoption, sigma);
 posses=[];
 [FramesNo,~]=size(kymo);
 cleankymo=kymo;
-for jj=1:FramesNo
-    prf=kymo(jj,:);
-    [peakprops,buildprf]=peel_peaks_from_profile(prf,2.4,0);   
-    cleankymo(jj,:)=buildprf-median(buildprf);
-    [LL,~]=size(peakprops);
-    posses=[posses; [jj+zeros(LL,1) peakprops(:,3)]];
-end
+    switch peakfitoption
+        case 'peeling'
+            for jj=1:FramesNo 
+                prf=kymo(jj,:);
+                prf=smooth(prf,4);
+                [peakprops,buildprf]=peel_peaks_from_profile(prf',2.7,0);   
+                cleankymo(jj,:)=buildprf-median(buildprf);
+                [betterpeaks, betterpeaksvals]= Refine_Peaks(prf,peakprops(:,3), 0);
+                [LL,~]=size(peakprops);    
+                posses=[posses; [jj+zeros(LL,1) betterpeaks peakprops(:,3)]];
+            end
+        case 'flatbottom'
+             for jj=1:FramesNo 
+                prf=kymo(jj,:);
+                 prf=JKD1_PRF_smooth(prf',4);
+                [firstpeaks,betterpeaks, betterpeaksvals]=...
+                 JKD1_PRF_get1Dpeaksflatbottom(prf,sigma,1,0);%data,sigs,refine,plotit
+                dum=1;
+                LL=length(betterpeaks);
+                posses=[posses; [jj+zeros(LL,1) betterpeaks firstpeaks]];
+             end
+        case 'edgedetect'
+            [kymo_shr, realshrinkfactor]=shrink_kymo(kymo, 1);
+          
+            [stepfitim_c,stepfitim_r,stepcoords_r,stepcoords_c]=StepfindImage(kymo_shr);
+            posses=[stepcoords_c(:,2) realshrinkfactor*stepcoords_c(:,3) realshrinkfactor*stepcoords_c(:,3)];
+    end
+    
+     function [kymo_shr, realshrinkfactor]=shrink_kymo(kymo, shrinkfactor);
+     %shorten along x with about the psf in pixels
+     
+     [rr,cc0]=size(kymo);
+     cc1=round(cc0/shrinkfactor);
+     kymo_shr=zeros(rr,cc1);
+     ax0=1:cc0;
+     ax1=linspace(1,cc0,cc1);
+     for ii=1:rr
+         prf0=kymo(ii,:);
+         prf1=interp1(ax0,prf0,ax1,'spline');
+         kymo_shr(ii,:)=prf1;
+     end
+     realshrinkfactor=cc0/cc1;   
+         
