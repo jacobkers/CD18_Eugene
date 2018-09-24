@@ -11,8 +11,20 @@ function A020_KymoStackTrack
 
 close all;
 loadImageJ_kymograph=1;
+datapath='D:\jkerssemakers\_Data\CD\2018_Eugene\';
+exprun=2;
+switch exprun
+    case 1
+        generaldatapth=[datapath,'2018_08_01 Pilot Runs\'];
+        AllExp=[1 3];  %numbers of various rois   
+    case 2
+        generaldatapth=[datapath,'\2018_09_24 More_molecules\'];
+        AllExp=[2 4 5 6 7 8 9 10 11 12 13 14 15 16];  %paths to various rois  
+        AllExp=[7 8 9 10 11 12 13 14 15 16];  %paths to various rois   
+end
 
-generaldatapth='D:\jkerssemakers\_Data\CD\2018_Eugene\';  
+outpath=strcat(generaldatapth, 'matlabresults\');
+if ~isdir(outpath), mkdir(outpath); end
 
 %% standardized subdirectory names 
 Channel_list=[{'DNA\'}, {'Condensin\'}];     %The two subchannels
@@ -20,22 +32,24 @@ Kymo_list='kymo_ImageJ\'; %ImageJ-made kymographs
 Condensin_Kymo='Kymograph_Condensin.tif';           %if you use it
 Dna_Kymo='Kymograph_DNA.tif';                %if you use it';
 
-%% some experiment-specific settings
-AllExp=[{'ROI'} {'ROI3'}];  %paths to various experiments   
+%% some roi-specific settings
+
 
 
 %% main loop
 LE=length(AllExp);  %for all experiments
-for ee=1:LE
-if mod(ee,2)==0, disp(strcat('Exps to work through:',num2str(LE-ee)));end    
-Exp=AllExp(ee);
+for ee=1:1:LE
+if mod(ee,2)==0, disp(strcat('Exps to work through:',num2str(LE-ee)));end 
+Exp=strcat('ROI',num2str(AllExp(ee)));
 
 % 1) build stack of images and kymograph (or load it)
 if loadImageJ_kymograph             %load kymograph
     dna_name=char(strcat(generaldatapth, Exp, '\', Kymo_list,Dna_Kymo));
     condensin_name=char(strcat(generaldatapth, Exp,'\', Kymo_list,Condensin_Kymo));
+    if exist(condensin_name)==2, do_condensin==1, else  do_condensin=0;end   
+    if do_condensin, kymo_Cnd=double(imread(condensin_name)),end;     
     kymo_DNA=double(imread(dna_name));
-    kymo_Cnd=double(imread(condensin_name));    
+    
 else                                %make two kymographs
     dna_pth=char(strcat(generaldatapth, Exp,'\', Channel_list(1)));
     condensin_pth=char(strcat(generaldatapth, Exp,'\', Channel_list(2)));    
@@ -44,7 +58,9 @@ else                                %make two kymographs
 end
 
 % 2 do peak analysis on each profile of the kymographs
-posses_Cnd=PeakFit_kymo(kymo_Cnd,'flatbottom',4);
+if do_condensin,
+    posses_Cnd=PeakFit_kymo(kymo_Cnd,'flatbottom',4);
+end
 
 %2a do loop analysis
 kymo_DNA=kymo_DNA-min(kymo_DNA(:));
@@ -53,30 +69,37 @@ loopinfo=Analyze_Loop(kymo_DNA_loop,kymo_DNA_residu);
 
 % 3 show result
 figure(1);
-    [rrc,ccc]=size(kymo_Cnd);
+     if do_condensin, 
+        [rrc,ccc]=size(kymo_Cnd);
+        subplot(2,2,1); 
+            pcolor(kymo_Cnd); shading flat, colormap hot;
+            title('Condensin'); ylabel('frame no.');    
+        subplot(2,2,3); 
+            plot(posses_Cnd(:,2),posses_Cnd(:,1),'ko', 'MarkerSize',2);
+            xlabel('position'); ylabel('frame no.');
+            xlim([1 ccc]); ylim([1 rrc]);
+     end
     [rrd,ccd]=size(kymo_DNA);
-    subplot(2,2,1); pcolor(kymo_Cnd); shading flat, colormap hot;
-    title('Condensin'); ylabel('frame no.');
     subplot(2,2,2); pcolor(kymo_DNA); shading flat, colormap hot;
     title('DNA'); ylabel('frame no.');
-    subplot(2,2,3); plot(posses_Cnd(:,2),posses_Cnd(:,1),'ko', 'MarkerSize',2);
-    xlabel('position'); ylabel('frame no.');
-    xlim([1 ccc]); ylim([1 rrc]);
-    %subplot(2,2,4); plot(posses_DNA(:,2),posses_DNA(:,1),'ko','MarkerSize',2);
-    %xlabel('position'); ylabel('frame no.');
-     %   xlim([1 ccd]); ylim([1 rrd]);
 
+ 
 figure(2);
     subplot(1,2,1);
-    plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on;
-    
     pairx=[loopinfo.left' loopinfo.right'];
-    pairy=[loopinfo.fr' loopinfo.fr'];   
+    pairy=[loopinfo.fr' loopinfo.fr'];      
+    if do_condensin,plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on; end
+    plot(loopinfo.main,loopinfo.fr,'go'); hold on;
     plot(pairx',pairy','b-');
-    legend('Condensin','Loop');
+    
+    if do_condensin,legend('Condensin', 'Loop main peak','Loop edges'); else
+    legend('Loop main peak','Loop edges'); end
     xlim([1 ccd]); ylim([1 rrd]);
-    plot(pairx,pairy,'bo','MarkerSize',3,'MarkerFaceColor','b');
-    plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on;
+    plot(pairx,pairy,'bo','MarkerSize',3,'MarkerFaceColor','b');    
+    plot(loopinfo.main,loopinfo.fr,'go','MarkerSize',3);
+    
+    if do_condensin,plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on; end
+    
     xlabel('position, pixels');
     ylabel('frame no.');
     
@@ -91,13 +114,18 @@ figure(2);
     ylabel('loopcontent, %');
     xlim([1 loopinfo.fr(end)]);
 
-% save data
-SaveName=char(strcat(generaldatapth, Exp));
-save(strcat(SaveName, '_allresults.mat'),... 
-            'kymo_Cnd',     'kymo_DNA',...
-            'kymo_DNA_loop', 'kymo_DNA_residu',...
-            'posses_Cnd', 'loopinfo');
-saveas(gcf,strcat(SaveName, '_plots.jpg'),'jpg');      
+    % save data
+    SaveName=char(strcat(outpath, Exp));
+    
+    save(strcat(SaveName, '_allresults.mat'),... 
+                'kymo_DNA',...
+                'kymo_DNA_loop', 'kymo_DNA_residu',...
+                 'loopinfo');
+    if do_condensin,
+        save(strcat(SaveName, '_allresults.mat'),... 
+                'kymo_Cnd','posses_Cnd', '-append');
+    end
+    saveas(gcf,strcat(SaveName, '_plots.jpg'),'jpg');      
 end
 
 function kymo=Build_kymo(pth)
@@ -208,29 +236,49 @@ function [loop_DNA,residu_DNA]=Clean_Kymo(kymo_DNA);
         loopinfo.fr=[];
         loopinfo.left=[];
         loopinfo.right=[];
+        loopinfo.main=[];
         for jj=1:FramesNo 
             loopinfo.fr(jj)=jj;
             prf=loop_kymo(jj,:);
             prf_res=residu_kymo(jj,:);
             prf=(smooth(prf,4));
-            [peakprops,buildprf,clusterprops, allclusters]=peel_peaks_from_profile_plusclusters(prf',2.7,0,'NonPeriodic');
-            %peakprops: [peakcount PeakVal Xpos Psf ThisSpotFraction(peakcount) CoveredFraction(peakcount) RelChange]];
+            %[peakprops,buildprf,clusterprops, allclusters]=peel_peaks_from_profile_plusclusters(prf',2.7,0,'NonPeriodic');
+            [peakprops,buildcurve]=peel_peaks_from_profile(prf',2.7,0);
             %clusterprops: [ii ClusterComPos ClusterContent];
             prf=prf';
             % 1. set a left and right cluster border
             tresh=0.2;
-            sel=find(prf>max(prf)*tresh);
+            cum_prf=cumsum(100*prf/sum(prf));
+            %sel=find((cum_prf>15)&(cum_prf<85));
+            sel=find((prf>tresh*max(prf)));
             if ~isempty(sel)
+                %get the left and right edge               
                 lft_edge=sel(1);
                 rgt_edge=sel(end);
+                
+                
                 %2 find encompassed spot positions
                 inpeaks_ix=find((peakprops(:,3)>lft_edge)&(peakprops(:,3)<rgt_edge));
-                inpeaks_x=sort(peakprops(inpeaks_ix,3));
-                loopinfo.left(jj)=inpeaks_x(1);
-                loopinfo.right(jj)=inpeaks_x(end);
-                loopinfo.length(jj)=inpeaks_x(end)-inpeaks_x(1);
-                inpeaks_content=nansum(peakprops(inpeaks_ix,5));
-                loopinfo.perc(jj)=100*inpeaks_content*sum(prf)/(sum(prf+prf_res));
+                if ~isempty(inpeaks_ix);
+                inpeaks=peakprops(inpeaks_ix,:);
+                [~,idx_mx]=nanmax(inpeaks(:,5));
+                    mainpeakx=inpeaks(idx_mx,3);               
+                    loopinfo.main(jj)=mainpeakx;
+                
+                    [inpeaks_x,sortidx]=sort(inpeaks(:,3));                
+                    loopinfo.left(jj)=inpeaks_x(1);
+                    loopinfo.right(jj)=inpeaks_x(end);
+                
+                    loopinfo.length(jj)=inpeaks_x(end)-inpeaks_x(1);
+                    inpeaks_content=nansum(peakprops(inpeaks_ix,5));
+                    loopinfo.perc(jj)=100*inpeaks_content*sum(prf)/(sum(prf+prf_res));
+                   else
+                    loopinfo.main(jj)=NaN;
+                    loopinfo.left(jj)=NaN;
+                    loopinfo.right(jj)=NaN;
+                    loopinfo.length(jj)=NaN;
+                    loopinfo.perc(jj)=NaN;                    
+                end
                 end
             dum=1;
         end

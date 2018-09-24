@@ -5,13 +5,11 @@ function [AllPeakProps,BuildCurve,AllClusterProps, AllClusters]=peel_peaks_from_
 %  AllPeakProps=[[AllPeakProps];...
 %     [peakcount PeakVal Xpos Psf ThisSpotFraction(peakcount) CoveredFraction(peakcount) RelChange]];  
 
-
-
 % Psf sets the width of Gaussians to peel off           
 StopRelChange=0.03;     %0.01 means 1% of change in covered fraction
 ChipIt=1;            %This is the fraction of the local maximum that ...                       %is used to build the gauss to be subtracted
 MainPeakMinFract=0.20;   %this sets the treshold for 'main peaks'; the number of these (not the positions) 
-%sets the number of clusters to be found by k-menas clustering
+%sets the number of clusters to be found by k-means clustering
 
                       
 if nargin<4
@@ -46,7 +44,10 @@ AllPeakProps=[];
 
 AllOnePeakCurves=[];
 while ~stopit
-    [PeakVal,Xpos]=max(PeelCurve);                 
+    [PeakVal,Xpos]=max(PeelCurve);  
+    dx=subpix_aroundzero(PeelCurve');
+    Xpos=Xpos+dx;
+    
     OnePeakCurve=ChipIt*PeakVal*OnePeak(Xax,Xpos,Psf);    
     PeelCurve=PeelCurve-OnePeakCurve;
     BuildCurve=BuildCurve+OnePeakCurve;
@@ -86,6 +87,7 @@ sel=find(SortPeakPosByX(:,5)>MainPeakMinFract);  %7% content peaks'
 
 LS=max([length(sel) 1]);
 Xpos=SortPeakPosByX(:,3);
+
 [idx,C] = kmeans(Xpos,LS);
 AllClusters=[];
 AllClusterProps=[];
@@ -189,3 +191,13 @@ function PP= OnePeak(x,ux,s)
 %This is the equation for a normalized1D gaussian peak value one
 PP =exp (-(x-ux).^2./(2*s.^2));
 
+function  x=subpix_aroundzero(prfx);
+     %3-point subpixel fit
+     xax=[-1:1:1]'; [~,mxi]=max(prfx);
+     lpr=length(prfx);
+     idxes=mxi-1:1:mxi+1;
+     sel=find(idxes<1); idxes(sel)=idxes(sel)+lpr;
+     sel=find(idxes>lpr); idxes(sel)=idxes(sel)-lpr;
+     prfx=prfx(idxes);   %peak parabols with edge transfer     
+     prms=polyfit(xax,prfx,2); x=-prms(2)/(2*prms(1));
+     
