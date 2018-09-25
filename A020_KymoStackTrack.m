@@ -20,7 +20,8 @@ switch exprun
     case 2
         generaldatapth=[datapath,'\2018_09_24 More_molecules\'];
         AllExp=[2 4 5 6 7 8 9 10 11 12 13 14 15 16];  %paths to various rois  
-        AllExp=[7 8 9 10 11 12 13 14 15 16];  %paths to various rois   
+        %AllExp=[7 8 9 10 11 12 13 14 15 16];  %paths to various rois   
+        %AllExp=[10];  %paths to various rois   
 end
 
 outpath=strcat(generaldatapth, 'matlabresults\');
@@ -39,15 +40,15 @@ Dna_Kymo='Kymograph_DNA.tif';                %if you use it';
 %% main loop
 LE=length(AllExp);  %for all experiments
 for ee=1:1:LE
-if mod(ee,2)==0, disp(strcat('Exps to work through:',num2str(LE-ee)));end 
+if mod(ee,1)==0, disp(strcat('Exps to work through:',num2str(LE-ee)));end 
 Exp=strcat('ROI',num2str(AllExp(ee)));
 
 % 1) build stack of images and kymograph (or load it)
 if loadImageJ_kymograph             %load kymograph
     dna_name=char(strcat(generaldatapth, Exp, '\', Kymo_list,Dna_Kymo));
     condensin_name=char(strcat(generaldatapth, Exp,'\', Kymo_list,Condensin_Kymo));
-    if exist(condensin_name)==2, do_condensin==1, else  do_condensin=0;end   
-    if do_condensin, kymo_Cnd=double(imread(condensin_name)),end;     
+    if exist(condensin_name)==2, do_condensin=1;, else  do_condensin=0;end   
+    if do_condensin, kymo_Cnd=double(imread(condensin_name));end;     
     kymo_DNA=double(imread(dna_name));
     
 else                                %make two kymographs
@@ -58,34 +59,32 @@ else                                %make two kymographs
 end
 
 % 2 do peak analysis on each profile of the kymographs
-if do_condensin,
+if do_condensin
     posses_Cnd=PeakFit_kymo(kymo_Cnd,'flatbottom',4);
 end
 
 %2a do loop analysis
-kymo_DNA=kymo_DNA-min(kymo_DNA(:));
-[kymo_DNA_loop,kymo_DNA_residu]=Clean_Kymo(kymo_DNA);
-loopinfo=Analyze_Loop(kymo_DNA_loop,kymo_DNA_residu);
+loopinfo=Analyze_Loop(kymo_DNA);
 
 % 3 show result
 figure(1);
-     if do_condensin, 
-        [rrc,ccc]=size(kymo_Cnd);
-        subplot(2,2,1); 
-            pcolor(kymo_Cnd); shading flat, colormap hot;
-            title('Condensin'); ylabel('frame no.');    
-        subplot(2,2,3); 
-            plot(posses_Cnd(:,2),posses_Cnd(:,1),'ko', 'MarkerSize',2);
-            xlabel('position'); ylabel('frame no.');
-            xlim([1 ccc]); ylim([1 rrc]);
-     end
     [rrd,ccd]=size(kymo_DNA);
-    subplot(2,2,2); pcolor(kymo_DNA); shading flat, colormap hot;
-    title('DNA'); ylabel('frame no.');
+     if do_condensin 
+        [rrc,ccc]=size(kymo_Cnd);
+        subplot(2,3,1); 
+            pcolor(kymo_Cnd); shading flat, colormap hot;
+            title('Condensin'); ylabel('frame no.');              
+        subplot(2,3,4);         
+            pcolor(kymo_DNA); shading flat, colormap hot;
+        title('DNA'); ylabel('frame no.');
+     else
+         subplot(1,3,1); 
+            pcolor(kymo_DNA); shading flat, colormap hot;
+        title('DNA'); ylabel('frame no.');
+     end
 
- 
-figure(2);
-    subplot(1,2,1);
+
+    subplot(1,3,2);
     pairx=[loopinfo.left' loopinfo.right'];
     pairy=[loopinfo.fr' loopinfo.fr'];      
     if do_condensin,plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on; end
@@ -103,13 +102,17 @@ figure(2);
     xlabel('position, pixels');
     ylabel('frame no.');
     
-    subplot(2,2,2);
-    plot(loopinfo.fr, loopinfo.length, 'b-');
-    xlabel('frame no.');
-    ylabel('looplength, pixels');
-     xlim([1 loopinfo.fr(end)]);
-    subplot(2,2,4);
-    plot(loopinfo.fr, loopinfo.perc, 'k-');
+%     subplot(2,3,3);
+%     plot(loopinfo.fr, loopinfo.length, 'b-');
+%     xlabel('frame no.');
+%     ylabel('looplength, pixels');
+%      xlim([1 loopinfo.fr(end)]);
+    subplot(1,3,3);
+    plot(loopinfo.fr, loopinfo.perc, 'r-'); hold on;
+    plot(loopinfo.fr, loopinfo.perc_mid, 'm-'); hold on;
+    plot(loopinfo.fr, loopinfo.perc_left, 'k-'); hold on;
+    plot(loopinfo.fr, loopinfo.perc_right, 'b-'); hold off;
+    legend('loop only', 'loop section', 'left section', 'right section','Location','SouthOutside');
     xlabel('frame no.');
     ylabel('loopcontent, %');
     xlim([1 loopinfo.fr(end)]);
@@ -119,9 +122,8 @@ figure(2);
     
     save(strcat(SaveName, '_allresults.mat'),... 
                 'kymo_DNA',...
-                'kymo_DNA_loop', 'kymo_DNA_residu',...
                  'loopinfo');
-    if do_condensin,
+    if do_condensin
         save(strcat(SaveName, '_allresults.mat'),... 
                 'kymo_Cnd','posses_Cnd', '-append');
     end
@@ -194,31 +196,8 @@ cleankymo=kymo;
      end
      realshrinkfactor=cc0/cc1;   
          
-function [loop_DNA,residu_DNA]=Clean_Kymo(kymo_DNA);
-    %Remove lowerpart(non-condensed) part
-    tetherlevel=median(kymo_DNA(:));
-    loop_DNA=kymo_DNA-tetherlevel;
-    loop_DNA(loop_DNA<0)=0;   %shave off level
-    residu_DNA=kymo_DNA-loop_DNA;
-    if 0
-        close all;
-        subplot(2,2,1);
-        pcolor(kymo_DNA); shading flat, colormap hot;
-        title('original');
-        subplot(2,2,2);
-        pcolor(loop_DNA); shading flat, colormap hot;
-        title('condensed');
-        subplot(2,2,3);
-        pcolor(residu_DNA); shading flat, colormap hot;
-        title('tether residu');
-        subplot(2,2,4);
-        plot(residu_DNA','k-');  hold on;
-        plot(loop_DNA','r-'); 
-        title('residu and condensed');
-        dum=1;
-    end
     
-   function loopinfo=Analyze_Loop(loop_kymo,residu_kymo);
+   function loopinfo=Analyze_Loop(kymo_DNA);
        %assume one dna loop ('cluster')
        % 1. set a left and right cluster border, based on treshold from
        % buildcurve
@@ -230,27 +209,51 @@ function [loop_DNA,residu_DNA]=Clean_Kymo(kymo_DNA);
        %loopinfo.rightpos
        %loopinfo.relcontent: amount of signal in the loop compared to the
        %residu
-        [FramesNo,~]=size(loop_kymo);
+       %Remove lowerpart(non-condensed) part
         loopinfo.length=[];
-        loopinfo.perc=[];
+        loopinfo.perc=[];  %percentage in loop alone
         loopinfo.fr=[];
         loopinfo.left=[];
         loopinfo.right=[];
         loopinfo.main=[];
+        loopinfo.perc_left=[];  %all fluorescence left of loop
+        loopinfo.perc_mid=[];   %same, in and under loop
+        loopinfo.perc_right=[]; %same, right side
+        
+        
+        %step 1: identify loop 
+        kymo_DNA=kymo_DNA-min(kymo_DNA(:)); 
+        kymo_DNA=JKD2_IM_smoothJK(kymo_DNA,3);
+        
+        
+        fluo=Get_FluoLevelProps(kymo_DNA);
+        
+        
+        %define a kymograph containing as much as possible only loop signal
+        loop_kymo=kymo_DNA-fluo.level_looptreshold;
+        loop_kymo(loop_kymo<0)=0;   %shave off level
+        looplevel=mean(loop_kymo(loop_kymo~=0));       
+        residu_kymo=kymo_DNA-loop_kymo;      
+        
+        %define a kymograph with fluorescent content only (no dark noise)
+        content_kymo=kymo_DNA-fluo.level_darktreshold;
+        content_kymo(content_kymo<0)=0;   %shave off level
+        
+        
+        [FramesNo,~]=size(loop_kymo);
         for jj=1:FramesNo 
             loopinfo.fr(jj)=jj;
             prf=loop_kymo(jj,:);
             prf_res=residu_kymo(jj,:);
+            prf_cont=content_kymo(jj,:);
             prf=(smooth(prf,4));
-            %[peakprops,buildprf,clusterprops, allclusters]=peel_peaks_from_profile_plusclusters(prf',2.7,0,'NonPeriodic');
             [peakprops,buildcurve]=peel_peaks_from_profile(prf',2.7,0);
-            %clusterprops: [ii ClusterComPos ClusterContent];
             prf=prf';
             % 1. set a left and right cluster border
-            tresh=0.2;
-            cum_prf=cumsum(100*prf/sum(prf));
-            %sel=find((cum_prf>15)&(cum_prf<85));
-            sel=find((prf>tresh*max(prf)));
+            tresh=0.25*looplevel;
+            sel=find(prf>tresh);
+            
+            
             if ~isempty(sel)
                 %get the left and right edge               
                 lft_edge=sel(1);
@@ -272,15 +275,57 @@ function [loop_DNA,residu_DNA]=Clean_Kymo(kymo_DNA);
                     loopinfo.length(jj)=inpeaks_x(end)-inpeaks_x(1);
                     inpeaks_content=nansum(peakprops(inpeaks_ix,5));
                     loopinfo.perc(jj)=100*inpeaks_content*sum(prf)/(sum(prf+prf_res));
+                    
+                    
+                    leftperc=100*sum(prf_cont(1:lft_edge))/sum(prf_cont);
+                    midperc=100*sum(prf_cont(lft_edge:rgt_edge))/sum(prf_cont);
+                    rightperc=100*sum(prf_cont(rgt_edge:end))/sum(prf_cont);
+                   
+                    
+                    loopinfo.perc_left(jj)=leftperc;  %all fluorescence left of loop
+                    loopinfo.perc_mid(jj)=midperc;   %same, in and under loop
+                    loopinfo.perc_right(jj)=rightperc; %same, right side
+                    
+                    
                    else
                     loopinfo.main(jj)=NaN;
                     loopinfo.left(jj)=NaN;
                     loopinfo.right(jj)=NaN;
                     loopinfo.length(jj)=NaN;
-                    loopinfo.perc(jj)=NaN;                    
+                    loopinfo.perc(jj)=NaN;     
+                    loopinfo.perc_left(jj)=NaN;  %all fluorescence left of loop
+                    loopinfo.perc_mid(jj)=NaN;   %same, in and under loop
+                    loopinfo.perc_right(jj)=NaN; %same, right side
+                    
                 end
                 end
             dum=1;
         end
-     
-        dum=1;
+        
+        
+     function fluo=Get_FluoLevelProps(kymo);         
+     kymo=double(kymo');  %position is vertical
+    [rr,cc]=size(kymo);
+    %1 First, we make estimates on intensity and noise of the background (outside
+    %the DNA).'local background' is defined as the average of the outer two
+    %image lines'. Then estimate dark (camera) noise via the spread in the difference between
+    %neighbouring pixels
+        fluo.level_dark=(mean(mean(kymo(1:2,:)))+mean(mean(kymo(rr-1:rr,:))))/2; 
+        diftop=kymo(1:2,2:end)-kymo(1:2,1:end-1); 
+        difbot=kymo(rr-2:rr,2:end)-kymo(rr-2:rr,1:end-1);
+        dif=[diftop(:);  difbot(:)];
+        fluo.noise_dark=std(dif)/2^0.5;
+    
+        %define an' surely inside tether' area
+       
+       tetherarea=kymo(20:end-20,:);
+       fluo.tetherlevel=median(tetherarea(:));
+    
+    %define as 'fluorescence' those pixels sufficiently above the darklevel.
+    %Note this may not be representative for the outline of the bacterium,
+    %since there is some blurring and we want to measure all fluorescence
+    fluo.level_darktreshold=fluo.level_dark+2*fluo.noise_dark;
+    fluo.level_tethertreshold=fluo.tetherlevel-2*fluo.noise_dark;
+    fluo.level_looptreshold=fluo.tetherlevel+2*fluo.noise_dark;
+    
+   dum=1;

@@ -3,7 +3,9 @@ function [stepfitim_c,stepfitim_r,stepcoords_r,stepcoords_c]=StepfindImage(im)
     %---------------------------------------------------------------
     %This function performs ccolumn- and row wise step analysis on a suposedly
     %ridge image. Jacob Kers 2015. The result is combined to yield
-    %coordinates of edges detected either column- or  row-wise    
+    %coordinates of edges detected either column- or  row-wise  
+    
+    %output: [stepidx,XXr(stepidx) YYr(stepidx) stepsX(:,3) stepsX(:,4)];
     %------------------------------------- 
     
   if nargin <1  %demo mode
