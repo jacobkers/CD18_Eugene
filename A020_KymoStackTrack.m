@@ -8,11 +8,13 @@ function A020_KymoStackTrack
 %JacobKers2018
 %
 %:JWJK_A-------------------------------------------------------------------
+actions.analyze=0;
+
 
 close all;
 loadImageJ_kymograph=1;
 datapath='D:\jkerssemakers\_Data\CD\2018_Eugene\';
-exprun=2;
+exprun=1;
 switch exprun
     case 1
         generaldatapth=[datapath,'2018_08_01 Pilot Runs\'];
@@ -21,10 +23,12 @@ switch exprun
         generaldatapth=[datapath,'\2018_09_24 More_molecules\'];
         AllExp=[2 4 5 6 7 8 9 10 11 12 13 14 15 16];  %paths to various rois  
         %AllExp=[7 8 9 10 11 12 13 14 15 16];  %paths to various rois   
-        %AllExp=[10];  %paths to various rois   
+        AllExp=[13];  %paths to various rois   
 end
 
 outpath=strcat(generaldatapth, 'matlabresults\');
+ 
+
 if ~isdir(outpath), mkdir(outpath); end
 
 %% standardized subdirectory names 
@@ -33,24 +37,21 @@ Kymo_list='kymo_ImageJ\'; %ImageJ-made kymographs
 Condensin_Kymo='Kymograph_Condensin.tif';           %if you use it
 Dna_Kymo='Kymograph_DNA.tif';                %if you use it';
 
-%% some roi-specific settings
-
-
 
 %% main loop
 LE=length(AllExp);  %for all experiments
+if actions.analyze
 for ee=1:1:LE
 if mod(ee,1)==0, disp(strcat('Exps to work through:',num2str(LE-ee)));end 
 Exp=strcat('ROI',num2str(AllExp(ee)));
-
+SaveName=char(strcat(outpath, Exp));  
 % 1) build stack of images and kymograph (or load it)
 if loadImageJ_kymograph             %load kymograph
     dna_name=char(strcat(generaldatapth, Exp, '\', Kymo_list,Dna_Kymo));
     condensin_name=char(strcat(generaldatapth, Exp,'\', Kymo_list,Condensin_Kymo));
     if exist(condensin_name)==2, do_condensin=1;, else  do_condensin=0;end   
     if do_condensin, kymo_Cnd=double(imread(condensin_name));end;     
-    kymo_DNA=double(imread(dna_name));
-    
+    kymo_DNA=double(imread(dna_name));    
 else                                %make two kymographs
     dna_pth=char(strcat(generaldatapth, Exp,'\', Channel_list(1)));
     condensin_pth=char(strcat(generaldatapth, Exp,'\', Channel_list(2)));    
@@ -66,11 +67,33 @@ end
 %2a do loop analysis
 loopinfo=Analyze_Loop(kymo_DNA);
 
-% 3 show result
-figure(1);
+%% save data
+    
+    save(strcat(SaveName,   '_allresults.mat'),... 
+                            'kymo_DNA',...
+                            'loopinfo');
+    if do_condensin
+        save(strcat(SaveName, '_allresults.mat'),... 
+                              'kymo_Cnd',...
+                              'posses_Cnd', '-append');
+    end   
+end
+end
+
+%% plot loop
+
+for ee=1:1:LE
+    Exp=strcat('ROI',num2str(AllExp(ee)));    
+    LoadName=char(strcat(outpath, Exp)); 
+    load(strcat(LoadName, '_allresults.mat'));
+    dna_name=char(strcat(generaldatapth, Exp, '\', Kymo_list,Dna_Kymo));
+    condensin_name=char(strcat(generaldatapth, Exp,'\', Kymo_list,Condensin_Kymo));
+    if exist(condensin_name)==2, do_condensin=1;, else  do_condensin=0;end   
+    
+    
+    figure(1);
     [rrd,ccd]=size(kymo_DNA);
      if do_condensin 
-        [rrc,ccc]=size(kymo_Cnd);
         subplot(2,3,1); 
             pcolor(kymo_Cnd); shading flat, colormap hot;
             title('Condensin'); ylabel('frame no.');              
@@ -85,49 +108,36 @@ figure(1);
 
 
     subplot(1,3,2);
-    pairx=[loopinfo.left' loopinfo.right'];
-    pairy=[loopinfo.fr' loopinfo.fr'];      
-    if do_condensin,plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on; end
-    plot(loopinfo.main,loopinfo.fr,'go'); hold on;
-    plot(pairx',pairy','b-');
+        pairx=[loopinfo.left' loopinfo.right'];
+        pairx2=[loopinfo.tetherleft' loopinfo.tetherright'];
+        pairy=[loopinfo.fr' loopinfo.fr'];      
+        if do_condensin,plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on; end
+        plot(loopinfo.main,loopinfo.fr,'go'); hold on;
+        plot(pairx',pairy','b-');
+        plot(pairx2',pairy','k+');
+        if do_condensin,legend('condensin', 'loop main peak','loop edges','tether edges'); else
+        legend('loop main peak','loop edges','tether edges'); end
+        xlim([1 ccd]); ylim([1 rrd]);
+        plot(pairx,pairy,'bo','MarkerSize',3,'MarkerFaceColor','b');    
+        plot(loopinfo.main,loopinfo.fr,'go','MarkerSize',3);    
+        if do_condensin,
+            plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on; 
+        end   
+        xlabel('position, pixels');
+        ylabel('frame no.');
+        hold off;
     
-    if do_condensin,legend('Condensin', 'Loop main peak','Loop edges'); else
-    legend('Loop main peak','Loop edges'); end
-    xlim([1 ccd]); ylim([1 rrd]);
-    plot(pairx,pairy,'bo','MarkerSize',3,'MarkerFaceColor','b');    
-    plot(loopinfo.main,loopinfo.fr,'go','MarkerSize',3);
-    
-    if do_condensin,plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on; end
-    
-    xlabel('position, pixels');
-    ylabel('frame no.');
-    
-%     subplot(2,3,3);
-%     plot(loopinfo.fr, loopinfo.length, 'b-');
-%     xlabel('frame no.');
-%     ylabel('looplength, pixels');
-%      xlim([1 loopinfo.fr(end)]);
     subplot(1,3,3);
-    plot(loopinfo.fr, loopinfo.perc, 'r-'); hold on;
-    plot(loopinfo.fr, loopinfo.perc_mid, 'm-'); hold on;
-    plot(loopinfo.fr, loopinfo.perc_left, 'k-'); hold on;
-    plot(loopinfo.fr, loopinfo.perc_right, 'b-'); hold off;
-    legend('loop only', 'loop section', 'left section', 'right section','Location','SouthOutside');
-    xlabel('frame no.');
-    ylabel('loopcontent, %');
-    xlim([1 loopinfo.fr(end)]);
-
-    % save data
-    SaveName=char(strcat(outpath, Exp));
-    
-    save(strcat(SaveName, '_allresults.mat'),... 
-                'kymo_DNA',...
-                 'loopinfo');
-    if do_condensin
-        save(strcat(SaveName, '_allresults.mat'),... 
-                'kymo_Cnd','posses_Cnd', '-append');
-    end
-    saveas(gcf,strcat(SaveName, '_plots.jpg'),'jpg');      
+        plot(loopinfo.fr, loopinfo.perc, 'r-'); hold on;
+        plot(loopinfo.fr, loopinfo.perc_mid, 'm-'); hold on;
+        plot(loopinfo.fr, loopinfo.perc_left, 'k-'); hold on;
+        plot(loopinfo.fr, loopinfo.perc_right, 'b-'); hold off;
+        legend('loop only', 'loop section', 'left section', 'right section','Location','SouthOutside');
+        xlabel('frame no.');
+        ylabel('loopcontent, %');
+        xlim([1 loopinfo.fr(end)]); 
+        hold off;
+    saveas(gcf,strcat(LoadName, '_plots.jpg'),'jpg');      
 end
 
 function kymo=Build_kymo(pth)
@@ -228,13 +238,12 @@ cleankymo=kymo;
         
         fluo=Get_FluoLevelProps(kymo_DNA);
         
-        
         %define a kymograph containing as much as possible only loop signal
         loop_kymo=kymo_DNA-fluo.level_looptreshold;
         loop_kymo(loop_kymo<0)=0;   %shave off level
         looplevel=mean(loop_kymo(loop_kymo~=0));       
         residu_kymo=kymo_DNA-loop_kymo;      
-        
+         
         %define a kymograph with fluorescent content only (no dark noise)
         content_kymo=kymo_DNA-fluo.level_darktreshold;
         content_kymo(content_kymo<0)=0;   %shave off level
@@ -242,52 +251,64 @@ cleankymo=kymo;
         
         [FramesNo,~]=size(loop_kymo);
         for jj=1:FramesNo 
-            loopinfo.fr(jj)=jj;
-            prf=loop_kymo(jj,:);
+            
+            
+            %loop analysis: get profiles
+            prf_ori=kymo_DNA(jj,:);
+            prf_loop=loop_kymo(jj,:);
             prf_res=residu_kymo(jj,:);
             prf_cont=content_kymo(jj,:);
-            prf=(smooth(prf,4));
-            [peakprops,buildcurve]=peel_peaks_from_profile(prf',2.7,0);
-            prf=prf';
+                       
+            if 0
+                plot(prf_ori,'k-'); hold on;
+                plot(prf_loop); hold on;                               
+                plot(prf_cont,'r-');
+                plot(prf_res,'b-');
+                xlabel('positition, pixel units');
+                ylabel('fluorescence intensity, a.u.');
+                legend('ori','loop','content','residu');               
+                [~]=ginput(1);
+                hold off
+            end
+            
+           [tetherstart,tetherstop]=Get_tetherlength(prf_res);
+           loopinfo.tetherleft(jj)=tetherstart;
+           loopinfo.tetherright(jj)=tetherstop;
+            
+            %get loop structure
+            prf_loop=(smooth(prf_loop,4));
+            [peakprops,buildcurve]=peel_peaks_from_profile(prf_loop',2.7,0);
+            prf_loop=prf_loop';
             % 1. set a left and right cluster border
             tresh=0.25*looplevel;
-            sel=find(prf>tresh);
+            sel=find(prf_loop>tresh);
             
-            
+            loopinfo.fr(jj)=jj;              
             if ~isempty(sel)
-                %get the left and right edge               
+                %get the left and right edge of the loop              
                 lft_edge=sel(1);
                 rgt_edge=sel(end);
-                
-                
+                               
                 %2 find encompassed spot positions
                 inpeaks_ix=find((peakprops(:,3)>lft_edge)&(peakprops(:,3)<rgt_edge));
                 if ~isempty(inpeaks_ix);
-                inpeaks=peakprops(inpeaks_ix,:);
-                [~,idx_mx]=nanmax(inpeaks(:,5));
+                    inpeaks=peakprops(inpeaks_ix,:);
+                    [~,idx_mx]=nanmax(inpeaks(:,5));
                     mainpeakx=inpeaks(idx_mx,3);               
-                    loopinfo.main(jj)=mainpeakx;
-                
+                    loopinfo.main(jj)=mainpeakx;                
                     [inpeaks_x,sortidx]=sort(inpeaks(:,3));                
                     loopinfo.left(jj)=inpeaks_x(1);
-                    loopinfo.right(jj)=inpeaks_x(end);
-                
+                    loopinfo.right(jj)=inpeaks_x(end);                
                     loopinfo.length(jj)=inpeaks_x(end)-inpeaks_x(1);
                     inpeaks_content=nansum(peakprops(inpeaks_ix,5));
-                    loopinfo.perc(jj)=100*inpeaks_content*sum(prf)/(sum(prf+prf_res));
-                    
-                    
+                    loopinfo.perc(jj)=100*inpeaks_content*sum(prf_loop)/(sum(prf_loop+prf_res));                    
                     leftperc=100*sum(prf_cont(1:lft_edge))/sum(prf_cont);
                     midperc=100*sum(prf_cont(lft_edge:rgt_edge))/sum(prf_cont);
-                    rightperc=100*sum(prf_cont(rgt_edge:end))/sum(prf_cont);
-                   
-                    
+                    rightperc=100*sum(prf_cont(rgt_edge:end))/sum(prf_cont);                   
                     loopinfo.perc_left(jj)=leftperc;  %all fluorescence left of loop
                     loopinfo.perc_mid(jj)=midperc;   %same, in and under loop
-                    loopinfo.perc_right(jj)=rightperc; %same, right side
-                    
-                    
-                   else
+                    loopinfo.perc_right(jj)=rightperc; %same, right side                   
+                  else
                     loopinfo.main(jj)=NaN;
                     loopinfo.left(jj)=NaN;
                     loopinfo.right(jj)=NaN;
@@ -329,3 +350,34 @@ cleankymo=kymo;
     fluo.level_looptreshold=fluo.tetherlevel+2*fluo.noise_dark;
     
    dum=1;
+
+   
+    function [tetherstart,tetherstop]=Get_tetherlength(prf_res);
+    %function uses 'shaved off' profile to find start and stop
+    tresval=0.25;
+    
+    lo=min(prf_res);
+    mid=mean(prf_res); %assuming most of profile is tether 
+    hi=max(prf_res);
+    sel=find(prf_res>lo+tresval*(mid-lo));
+    if ~isempty(sel);
+        tetherstart=min(sel);     tetherstop=max(sel);
+    else
+        tetherstart=NaN;     tetherstop=NaN;
+    end
+        
+    
+    if 0
+        close all;
+        plot(prf_res); hold on;
+        plot(0*prf_res+mid);
+        stem(tetherstart,prf_res(tetherstart),'ro');
+        stem(tetherstop,prf_res(tetherstop),'ro');
+        xlabel('positition, pixel units');
+        ylabel('fluorescence intensity, a.u.');
+        dum=1;
+    end
+    
+    
+        
+        
