@@ -8,7 +8,7 @@ function A020_KymoStackTrack
 %JacobKers2018
 %
 %:JWJK_A-------------------------------------------------------------------
-actions.analyze=0;
+actions.analyze=1;
 
 
 close all;
@@ -18,7 +18,7 @@ exprun=1;
 switch exprun
     case 1
         generaldatapth=[datapath,'2018_08_01 Pilot Runs\'];
-        AllExp=[1 3];  %numbers of various rois   
+        AllExp=[3 1];  %numbers of various rois   
     case 2
         generaldatapth=[datapath,'\2018_09_24 More_molecules\'];
         AllExp=[2 4 5 6 7 8 9 10 11 12 13 14 15 16];  %paths to various rois  
@@ -42,7 +42,7 @@ Dna_Kymo='Kymograph_DNA.tif';                %if you use it';
 LE=length(AllExp);  %for all experiments
 if actions.analyze
 for ee=1:1:LE
-if mod(ee,1)==0, disp(strcat('Exps to work through:',num2str(LE-ee)));end 
+if mod(ee,1)==0, disp(strcat('Analyzing: Exps to work through:',num2str(LE-ee)));end 
 Exp=strcat('ROI',num2str(AllExp(ee)));
 SaveName=char(strcat(outpath, Exp));  
 % 1) build stack of images and kymograph (or load it)
@@ -67,8 +67,7 @@ end
 %2a do loop analysis
 loopinfo=Analyze_Loop(kymo_DNA);
 
-%% save data
-    
+%% save data   
     save(strcat(SaveName,   '_allresults.mat'),... 
                             'kymo_DNA',...
                             'loopinfo');
@@ -85,6 +84,7 @@ end
 for ee=1:1:LE
     Exp=strcat('ROI',num2str(AllExp(ee)));    
     LoadName=char(strcat(outpath, Exp)); 
+    disp(strcat('Plotting: Exps to work through:',num2str(LE-ee)));
     load(strcat(LoadName, '_allresults.mat'));
     dna_name=char(strcat(generaldatapth, Exp, '\', Kymo_list,Dna_Kymo));
     condensin_name=char(strcat(generaldatapth, Exp,'\', Kymo_list,Condensin_Kymo));
@@ -214,28 +214,11 @@ cleankymo=kymo;
        %2. look for all spots (irrespective of cluster) that fall in this
        %slot. find leftmost and rightmost spot. The are the loop start and
        %stop positons, psf-corrected
-       %get out:
-       %loopinfo.leftpos: the s
-       %loopinfo.rightpos
-       %loopinfo.relcontent: amount of signal in the loop compared to the
-       %residu
-       %Remove lowerpart(non-condensed) part
-        loopinfo.length=[];
-        loopinfo.perc=[];  %percentage in loop alone
-        loopinfo.fr=[];
-        loopinfo.left=[];
-        loopinfo.right=[];
-        loopinfo.main=[];
-        loopinfo.perc_left=[];  %all fluorescence left of loop
-        loopinfo.perc_mid=[];   %same, in and under loop
-        loopinfo.perc_right=[]; %same, right side
-        
+       %get out:  
         
         %step 1: identify loop 
-        kymo_DNA=kymo_DNA-min(kymo_DNA(:)); 
-        kymo_DNA=JKD2_IM_smoothJK(kymo_DNA,3);
-        
-        
+        kymo_DNA=pre_cook_kymo_DNA(kymo_DNA);
+  
         fluo=Get_FluoLevelProps(kymo_DNA);
         
         %define a kymograph containing as much as possible only loop signal
@@ -255,10 +238,13 @@ cleankymo=kymo;
             
             %loop analysis: get profiles
             prf_ori=kymo_DNA(jj,:);
-            prf_loop=loop_kymo(jj,:);
-            prf_res=residu_kymo(jj,:);
-            prf_cont=content_kymo(jj,:);
-                       
+            if 1
+                prf_loop=loop_kymo(jj,:);
+                prf_res=residu_kymo(jj,:);
+                prf_cont=content_kymo(jj,:);
+            else
+                %[prf_loop,prf_res,prf_cont]=Split_profile(prf_ori);
+            end       
             if 0
                 plot(prf_ori,'k-'); hold on;
                 plot(prf_loop); hold on;                               
@@ -319,12 +305,11 @@ cleankymo=kymo;
                     loopinfo.perc_right(jj)=NaN; %same, right side
                     
                 end
-                end
-            dum=1;
+            end
         end
         
         
-     function fluo=Get_FluoLevelProps(kymo);         
+ function fluo=Get_FluoLevelProps(kymo);         
      kymo=double(kymo');  %position is vertical
     [rr,cc]=size(kymo);
     %1 First, we make estimates on intensity and noise of the background (outside
@@ -352,14 +337,21 @@ cleankymo=kymo;
    dum=1;
 
    
-    function [tetherstart,tetherstop]=Get_tetherlength(prf_res);
+ function [tetherstart,tetherstop]=Get_tetherlength(prf_res);
     %function uses 'shaved off' profile to find start and stop
-    tresval=0.25;
+    tresval=0.4;
+    Lp=length(prf_res); axz=1:Lp;
+        
+    [lo_L,ixL]=min(prf_res(1:ceil(Lp/2)));
+    [lo_R,ixR]=min(prf_res(ceil(Lp/2):end)); ixR=ixR+ceil(Lp/2)-1;
+    slopefit=polyval(polyfit([ixL ixR],[lo_L lo_R],1),axz);
     
-    lo=min(prf_res);
-    mid=mean(prf_res); %assuming most of profile is tether 
-    hi=max(prf_res);
-    sel=find(prf_res>lo+tresval*(mid-lo));
+    prf_res_ft=prf_res-slopefit;
+    mid_lev=mean(prf_res_ft); %assuming most of profile is tether
+    
+    lo=min(prf_res_ft);
+    sel=find(prf_res_ft>(lo+tresval*(mid_lev-lo)));
+    
     if ~isempty(sel);
         tetherstart=min(sel);     tetherstop=max(sel);
     else
@@ -367,17 +359,66 @@ cleankymo=kymo;
     end
         
     
-    if 0
-        close all;
-        plot(prf_res); hold on;
-        plot(0*prf_res+mid);
-        stem(tetherstart,prf_res(tetherstart),'ro');
-        stem(tetherstop,prf_res(tetherstop),'ro');
+    if 0       
+        plot(prf_res,'b-'); hold on;
+        plot(slopefit,'b-');
+        plot(prf_res_ft,'r');       
+        plot(0*prf_res+mid_lev,'r-');
+        stem(tetherstart,prf_res_ft(tetherstart),'ro');
+        stem(tetherstop,prf_res_ft(tetherstop),'ro');
+        legend('residu','minima fit','corrected','mean','edges');
         xlabel('positition, pixel units');
         ylabel('fluorescence intensity, a.u.');
-        dum=1;
+        pause(0.5);        
+        [~]=ginput(1);
+        hold off;
     end
     
     
         
+  function kymo_out=pre_cook_kymo_DNA(kymo);
+      %clean up: background slope, bleaching
+      %1 flatten background left-right
+      
+      prf_med=median(kymo);
+      allminval=min(prf_med);
+      [ff,Lp]=size(kymo);
+      xax=1:Lp;
         
+      [lo_L,ixL]=min(prf_med(1:ceil(Lp/2)));
+      [lo_R,ixR]=min(prf_med(ceil(Lp/2):end)); ixR=ixR+ceil(Lp/2)-1;
+      slopeline=polyval(polyfit([ixL ixR],[lo_L lo_R],1),xax);
+      slopeplane=repmat(slopeline,ff,1);
+      kymo=kymo-slopeplane+allminval;
+      
+      
+      %2 crude bleach correct
+      tax=1:ff;
+      bleachline=mean([kymo(1:ff,1) kymo(1:ff,end)]');
+      bleachline_nrm=bleachline/mean(bleachline);
+      bleachslope=polyval(polyfit(tax,bleachline_nrm,1),tax);
+      bleachplane=repmat(bleachslope',1,Lp);
+      
+      kymo=kymo./bleachplane;
+      kymo_out=JKD2_IM_smoothJK(kymo,3);
+      if 0          
+        subplot(1,2,1);
+            plot(tax(2:end),bleachline_nrm(2:end)); hold on;
+            plot(tax(2:end),bleachslope(2:end),'r');
+            title('bleach correction');
+            legend('mean edges, norm.','linear fit');
+            xlabel('time, frames');
+            ylabel('norm.intensity, a.u.');
+            xlim([1 ff]);
+        subplot(1,2,2);           
+            plot(prf_med,'b-'); hold on;
+            plot(slopeline,'b-');
+            plot(prf_med-slopeline+allminval,'r'); 
+            title('flattening');
+            legend('median','minima fit','corrected');
+            xlabel('position, pixel units');
+            ylabel('fluorescence intensity, a.u.');
+            pause(0.5);        
+            [~]=ginput(1);
+            hold off
+      end
