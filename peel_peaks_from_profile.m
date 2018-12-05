@@ -1,7 +1,7 @@
 function [peakprops,buildcurve]=peel_peaks_from_profile(PeaksCurve,Psf,showit)
 %this function subtracts 1D Gaussians from an image until a stop criterion
 %is reached. JacobKers 2016
-
+%[count PeakVal Xpos  Psf ThisSpotFraction CoveredFraction RelChange]]; 
 MaxPeakNo=10;           
 StopRelChange=0.1;     %0.01 means 1% of change in covered fraction
 ChipIt=1;            %This is the fraction of the local maximum that ...                        %is used to build the gauss to be subtracted
@@ -32,7 +32,6 @@ peakcount=1;
 CoveredFraction=[];
 peakprops=[];
 
-close all;
 while ~stopit
     [PeakVal,Xpos]=max(PeelCurve);                 
     OnePeakCurve=ChipIt*PeakVal*OnePeak(Xax,Xpos,Psf);    
