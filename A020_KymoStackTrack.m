@@ -11,11 +11,13 @@ function A020_KymoStackTrack
 actions.analyze=1; 
     %0 load pre-analyzed data for plot menu
     %1 re-analyze
-actions.plotmodus=1;  
+actions.plotmodus=2;  
     %0 don't plot or save, 
-    %1 save plot, don't show
-    %2 save&show plots
+    %1 save plot 1, don't show
+    %2 save plot 2, don't show
 
+initval.psf_est=3;
+    
 close all;
 loadImageJ_kymograph=1;
 datapath='D:\jkerssemakers\_Data\CD\2018_Eugene\';
@@ -34,7 +36,7 @@ switch exprun
         AllExp=[21 22 23 24 25 26 27];  %paths to various rois  
 end
 generaldatapth=[datapath,expname,'\'];
-outpath=strcat(generaldatapth, 'matlabresults\');
+outpath=strcat(datapath, 'matlabresults\',expname,'\');
  
 
 if ~isdir(outpath), mkdir(outpath); end
@@ -49,7 +51,7 @@ Dna_Kymo='Kymograph_DNA.tif';                %if you use it';
 %% main loop
 LE=length(AllExp);  %for all experiments
 if actions.analyze
-for ee=1:1:LE
+for ee=1:LE
 if mod(ee,1)==0, disp(strcat('Analyzing:',expname,':Exps to work through:',num2str(LE-ee+1)));end 
 Exp=strcat('ROI',num2str(AllExp(ee)));
 SaveName=char(strcat(outpath, Exp));  
@@ -68,43 +70,46 @@ else                                %make two kymographs
 end
 
 % 2 do peak analysis on each profile of the kymographs
-if do_condensin
-    posses_Cnd=PeakFit_kymo(kymo_Cnd,'flatbottom',4);
-end
 
-%2a do loop analysis
-    loopinfo=Analyze_Loop(kymo_DNA);
+
+%loop analysis
+    info_loop=Analyze_Loop(kymo_DNA);
+    
+if do_condensin
+    info_condensin=PeakFit_kymo(kymo_Cnd,'flatbottom',2.7,initval);
+    info_condensin=Label_Condensin_Loop(info_condensin,info_loop,initval);
+    
+end
 
 %% save data   
     save(strcat(SaveName,   '_allresults.mat'),... 
                             'kymo_DNA',...
-                            'loopinfo');
+                            'info_loop');
     if do_condensin
         save(strcat(SaveName, '_allresults.mat'),... 
                               'kymo_Cnd',...
-                              'posses_Cnd', '-append');
+                              'info_condensin', '-append');
     end   
 end
 end
 
-%% plot loop
-if actions.plotmodus>0;
+
+%% plot loop panel 1
+if actions.plotmodus>0;    
 for ee=1:1:LE
+     
     close all;
     Exp=strcat('ROI',num2str(AllExp(ee)));    
     LoadName=char(strcat(outpath, Exp)); 
     load(strcat(LoadName, '_allresults.mat'));
     dna_name=char(strcat(generaldatapth, Exp, '\', Kymo_list,Dna_Kymo));
     condensin_name=char(strcat(generaldatapth, Exp,'\', Kymo_list,Condensin_Kymo));
-    if exist(condensin_name)==2, do_condensin=1;, else  do_condensin=0;end   
+    if exist(condensin_name)==2, do_condensin=1;, else  do_condensin=0;end  
+    disp(strcat('Building&saving plots: Exps to work through:',num2str(LE-ee)));
     
-    if actions.plotmodus>1
-        figure(1);
-        disp(strcat('Building plots: Exps to work through:',num2str(LE-ee)));
-    else
-        set(figure(1), 'visible', 'off');
-        disp(strcat('Saving plots: Exps to work through:',num2str(LE-ee)));
-    end
+     %% plot panel 1: overview
+     if actions.plotmodus==1
+     set(figure(1), 'visible', 'off');
     [rrd,ccd]=size(kymo_DNA);
      if do_condensin 
         subplot(2,3,1); 
@@ -119,39 +124,111 @@ for ee=1:1:LE
         title('DNA'); ylabel('frame no.');
      end
 
-
     subplot(1,3,2);
-        pairx=[loopinfo.pos_loop_left' loopinfo.pos_loop_right'];
-        pairx2=[loopinfo.pos_tether_left' loopinfo.pos_tether_right'];
-        pairy=[loopinfo.frameno' loopinfo.frameno'];      
-        if do_condensin,plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on; end
-        plot(loopinfo.pos_loop_main,loopinfo.frameno,'go'); hold on;
+        pairx=[info_loop.pos_loop_left' info_loop.pos_loop_right'];
+        pairx2=[info_loop.pos_tether_left' info_loop.pos_tether_right'];
+        pairy=[info_loop.frameno' info_loop.frameno'];      
+        if do_condensin,
+            sel=find(info_condensin.label_loopassociated==1);
+            plot(info_condensin.pos_X_subpix(sel),info_condensin.pos_frameno(sel),'ro', 'MarkerSize',3); hold on; 
+        end
+        plot(info_loop.pos_loop_main,info_loop.frameno,'go'); hold on;
         plot(pairx',pairy','b-');
         plot(pairx2',pairy','k+');
-        if do_condensin,legend('condensin', 'loop main peak','loop edges','tether edges'); else
+        if do_condensin,legend('loop_condensins', 'loop main peak','loop edges','tether edges'); else
         legend('loop main peak','loop edges','tether edges'); end
         xlim([1 ccd]); ylim([1 rrd]);
         plot(pairx,pairy,'bo','MarkerSize',3,'MarkerFaceColor','b');    
-        plot(loopinfo.pos_loop_main,loopinfo.frameno,'go','MarkerSize',3);    
-        if do_condensin,
-            plot(posses_Cnd(:,2),posses_Cnd(:,1),'ro', 'MarkerSize',6); hold on; 
+        plot(info_loop.pos_loop_main,info_loop.frameno,'go','MarkerSize',3);    
+        if do_condensin
+            sel=find(info_condensin.label_loopassociated==1);
+            plot(info_condensin.pos_X_subpix(sel),info_condensin.pos_frameno(sel),'ro', 'MarkerSize',3); hold on; 
         end   
         xlabel('position, pixels');
         ylabel('frame no.');
         hold off;
     
     subplot(1,3,3);
-        plot(loopinfo.frameno, loopinfo.cont_loop_excess_raw, 'k-'); hold on;
-        plot(loopinfo.frameno, loopinfo.cont_loop_excess, 'r-'); hold on;
-        plot(loopinfo.frameno, loopinfo.cont_tether_mid, 'y-'); hold on;
-        plot(loopinfo.frameno, loopinfo.cont_tether_left, 'm-'); hold on;
-        plot(loopinfo.frameno, loopinfo.cont_tether_right, 'b-'); hold off;
-        legend('loop only-raw','loop only', 'loop section', 'left section', 'right section','Location','SouthOutside');
+        plot(info_loop.frameno, info_loop.cont_loop_excess_raw, 'k-'); hold on;
+        plot(info_loop.frameno, info_loop.cont_loop_excess, 'r-'); hold on;
+        plot(info_loop.frameno, info_loop.cont_loop_mushroom, 'y-'); hold on;
+        plot(info_loop.frameno, info_loop.cont_tether_left, 'm-'); hold on;
+        plot(info_loop.frameno, info_loop.cont_tether_right, 'b-'); hold off;
+        legend('loop only-raw','loop only', 'mid mushroom', 'left', 'right','Location','SouthOutside');
         xlabel('frame no.');
         ylabel('loopcontent, %');
-        xlim([1 loopinfo.frameno(end)]); 
+        xlim([1 info_loop.frameno(end)]); 
         hold off;
-    saveas(gcf,strcat(LoadName, '_plots.jpg'),'jpg');      
+  saveas(gcf,strcat(LoadName, '_plots.jpg'),'jpg'); 
+  end
+    
+    %% plot panel 2: condensin label result 
+ if do_condensin&&(actions.plotmodus==2)
+        set(figure(2), 'visible', 'off');
+  
+    %         info_condensin
+                    % pos_frameno
+                    % pos_X_pix
+                    % pos_X_subpix
+                    % content_peakvals
+                    % content_perspot_est
+                    % content_perspot_meas
+                    % label_OKspot
+                    % label_looplabel
+                    % label_generaledgelabel
+    LC=length(info_condensin.pos_frameno);
+    sel1=find((info_condensin.label_OKspot)==1); LOK=length(sel1);
+    sel2=find(((info_condensin.label_OKspot)==1)...
+              &(info_condensin.label_loopassociated==1)); LLP=length(sel2);
+    sel3=find(((info_condensin.label_OKspot)==1)...
+              &(info_condensin.label_generaledgelabel==3)); LLM=length(sel3);
+    sel4=find(((info_condensin.label_OKspot)==1)...
+              &((info_condensin.label_generaledgelabel==2)...
+                |(info_condensin.label_generaledgelabel==4))); LLE=length(sel4);
+     sel5=find(((info_condensin.label_OKspot)==1)...
+              &((info_condensin.label_generaledgelabel==1)...
+                |(info_condensin.label_generaledgelabel==5))); TTE=length(sel5);        
+    sel6=find(((info_condensin.label_OKspot)==1)...
+              &(info_condensin.label_generaledgelabel==0)); NN=length(sel6);                
+    
+          
+          
+     SpotSummaryLegend=([{'1.strengthOK'},{'2.loop'},...
+                        {'3.loop edges'},{'4.loop brightest'} ,{'5.tether edges'},...
+                        {'6.none'}]);   
+                    clr=[{'k'},{'b'},{'r'},{'m'},{'y'},{'g'}];
+    SpotSummaryVals=[LOK LLP  LLE LLM TTE NN];
+    LS=length(SpotSummaryVals);
+    subplot(1,3,1);
+    axz=1:LS;
+    for ii=1:LS
+        bar(axz(ii),SpotSummaryVals(ii),char(clr(ii))); hold on;       
+    end
+    axis tight;
+    legend(SpotSummaryLegend,'Location','NorthOutside');
+    title(strcat('Spot categoriesof: ',Exp));
+    binax=0:25:1000;
+    
+    subplot(3,2,2);
+    Freelabels=info_condensin.content_perspot_est(sel6);
+    hist_free=hist(Freelabels,binax);
+    bar(binax,hist_free,'k'); xlim([0 1000]); 
+    legend('free');
+    
+    subplot(3,2,4);
+    Edgelabels=info_condensin.content_perspot_est(sel4);
+    hist_edge=hist(Edgelabels,binax);
+    bar(binax,hist_edge,'r'); xlim([0 1000]); 
+    legend('loop edges');
+    
+     subplot(3,2,6);
+    Mainlabels=info_condensin.content_perspot_est(sel3);
+    hist_main=hist(Mainlabels,binax);
+    bar(binax,hist_main,'m'); xlim([0 1000]); 
+    legend('loop brightest');
+    
+    saveas(gcf,strcat(LoadName, '_spothistograms.jpg'),'jpg'); 
+ end
 end
 end
 end
@@ -174,17 +251,18 @@ function kymo=Build_kymo(pth)
     end
     
     
-function posses=PeakFit_kymo(kymo,peakfitoption, sigma);
+function condensin_info=PeakFit_kymo(kymo,peakfitoption, sigma,initval);
 posses=[];
+condensin_info=struct('pos_frameno',[]);
 [FramesNo,~]=size(kymo);
 cleankymo=kymo;
     switch peakfitoption
-        case 'peeling'
+        case 'peeling2'
             for jj=1:FramesNo 
                 prf=kymo(jj,:);
                 prf=smooth(prf,4);
                 %[peakprops,buildprf]=peel_peaks_from_profile(prf',2.7,1);
-                [peakprops,buildprf,clusterprops, allclusters]=peel_peaks_from_profile_plusclusters(prf',2.7,1,'NonPeriodic');
+                [peakprops,buildprf,~, ~]=peel_peaks_from_profile_plusclusters(prf',sigma,1,'NonPeriodic');
                 cleankymo(jj,:)=buildprf-median(buildprf);
                 [betterpeaks, betterpeaksvals]= Refine_Peaks(prf,peakprops(:,3), 0);
                 [LL,~]=size(peakprops);    
@@ -192,20 +270,41 @@ cleankymo=kymo;
             end
         case 'flatbottom'
              for jj=1:FramesNo 
-                prf=kymo(jj,:);
+                prf=kymo(jj,:); LP=length(prf); 
                  prf=JKD1_PRF_smooth(prf',4);
+                 prf=prf-min(prf);
                 [firstpeaks,betterpeaks, betterpeaksvals]=...
                  JKD1_PRF_get1Dpeaksflatbottom(prf,sigma,1,0);%data,sigs,refine,plotit
                 dum=1;
-                LL=length(betterpeaks);
-                posses=[posses; [jj+zeros(LL,1) betterpeaks firstpeaks]];
+                content=betterpeaksvals*((2*pi)^0.5*initval.psf_est);
+                LL=length(betterpeaks); cont_m=zeros(LL,1); 
+                if LP>0
+                idxes=1:LP; 
+                for pp=1:LL
+                    idx=firstpeaks(pp);
+                    sel=find((idxes>idx-2*initval.psf_est)&(idxes<idx+2*initval.psf_est));
+                    cont_m(pp)=sum(prf(sel));
+                    dum=1;
+                end
+                
+                end
+                
+                posses=[posses; [jj+zeros(LL,1) betterpeaks firstpeaks, betterpeaksvals content cont_m]];
              end
         case 'edgedetect'        
             [stepfitim_c,stepfitim_r,stepcoords_r,stepcoords_c]=StepfindImage(kymo);
-            stepcoords_c=Merge_Edges(stepcoords_c,stepfitim_c, kymo);
-            
+            stepcoords_c=Merge_Edges(stepcoords_c,stepfitim_c, kymo);  
             posses=[stepcoords_c(:,2) realshrinkfactor*stepcoords_c(:,3) realshrinkfactor*stepcoords_c(:,3)];
     end
+    
+    condensin_info.pos_frameno=posses(:,1)';
+    condensin_info.pos_X_pix=posses(:,3)';
+    condensin_info.pos_X_subpix=posses(:,2)';
+    condensin_info.content_peakvals=posses(:,4)';
+    condensin_info.content_perspot_est=posses(:,5)';
+    condensin_info.content_perspot_meas=posses(:,6)';
+    dum=1;
+    
     
      function [kymo_shr, realshrinkfactor]=shrink_kymo(kymo, shrinkfactor);
      %shorten along x with about the psf in pixels
@@ -261,8 +360,7 @@ cleankymo=kymo;
                 prf_cont=content_kymo(jj,:);
                 prf_cont=prf_cont-min(prf_cont);
       
-            
-            
+    
             %get edges of tether
            [tetherstart,tetherstop,tetherok]=Get_edgeslength(prf_res,'tether');
            loopinfo.pos_tether_left(jj)=tetherstart;
@@ -303,15 +401,15 @@ cleankymo=kymo;
                     inpeaks_content=nansum(peakprops(inpeaks_ix,5));
                     
                     loopinfo.pos_loop_main(jj)=inpeaks(idx_mx,3);  %pos main blob                                   
-                    loopinfo.pos_loop_left(jj)=lft_edge;          %pos left        
-                    loopinfo.pos_loop_right(jj)=rgt_edge;         %pos left       
-                    loopinfo.pos_loop_length(jj)=rgt_edge-lft_edge;
+                    loopinfo.pos_loop_left(jj)=inpeakpos_leftmost;          %pos left        
+                    loopinfo.pos_loop_right(jj)=inpeakpos_righmost;         %pos left       
+                    loopinfo.pos_loop_length(jj)=inpeakpos_righmost-inpeakpos_leftmost;
                     
                     %collect contents, all in percentages
 
                     loopinfo.cont_loop_excess(jj)=100*inpeaks_content*sum(prf_loop)/(sum(prf_loop+prf_res));                    
                     loopinfo.cont_tether_mid(jj)=100*sum(prf_cont(lft_edge+1:rgt_edge-1))/sum(prf_cont);;   %same, in and under loop
-                    loopinfo.cont_loop_midplusexcess(jj)=loopinfo.cont_loop_excess(jj)+loopinfo.cont_tether_mid(jj);
+                    loopinfo.cont_loop_mushroom(jj)=loopinfo.cont_loop_excess(jj)+loopinfo.cont_tether_mid(jj);
                     loopinfo.cont_tether_left(jj)=100*sum(prf_cont(1:lft_edge))/sum(prf_cont); %all fluorescence left of loop                    
                     loopinfo.cont_tether_right(jj)=100*sum(prf_cont(rgt_edge:end))/sum(prf_cont); ; %same, right side                                    
                     loopinfo.cont_tether_leftonly(jj)=loopinfo.cont_tether_left(jj)+loopinfo.cont_tether_mid(jj)/2;
@@ -490,3 +588,64 @@ cleankymo=kymo;
         loopinfo.cont_tether_right(jj)=NaN;                                
         loopinfo.cont_tether_leftonly(jj)=NaN;
         loopinfo.cont_tether_rightonly(jj)=NaN;
+        
+        function info_condensin=Label_Condensin_Loop(info_condensin,info_loop,initval);
+        %this fuction screens and labels the detected condensin spots
+%         info_condensin
+                    % pos_frameno
+                    % pos_X_pix
+                    % pos_X_subpix
+                    % content_peakvals
+                    % content_perspot_est
+                    % content_perspot_meas
+         info_condensin.label_OKspot=0*info_condensin.pos_frameno; 
+         info_condensin.label_loopassociated=0*info_condensin.pos_frameno;
+         info_condensin.label_generaledgelabel=0*info_condensin.pos_frameno;
+         
+         Ic=info_condensin.content_perspot_meas;
+         %first, get some measures
+        [flag,cleandata]=JKD1_PRF_outlier_flag(Ic,4,0.7,'all',0); 
+        sel=find(flag==1);
+        info_condensin.label_OKspot(sel)=1;
+        
+        %now, per time point
+        FF=max(info_loop.frameno);
+        for ii=1:FF
+            fi_L=find(info_loop.frameno==ii);
+            fi_C=find(info_condensin.pos_frameno==ii);
+            
+            if ~isempty(fi_L)&~isempty(fi_C);
+            
+                %loop positions of interest
+                L_lft=info_loop.pos_loop_left(fi_L);
+                L_mn=info_loop.pos_loop_main(fi_L);
+                L_rgt=info_loop.pos_loop_right(fi_L);
+                Th_lft=info_loop.pos_tether_left(fi_L);
+                Th_rgt=info_loop.pos_tether_right(fi_L);
+                Dna_geometry=[Th_lft L_lft L_mn L_rgt Th_rgt];
+                
+                Cxx=info_condensin.pos_X_subpix(fi_C); Lc=length(Cxx);
+                for jj=1:Lc
+                    oridx=fi_C(jj); %original indices of condensins;
+                    Cx=Cxx(jj);
+                    dd=abs(Dna_geometry-Cx);
+                    [val,labl]=min(dd);  %nearest of these
+                    if (Cx>L_lft-initval.psf_est)&(Cx<L_rgt+initval.psf_est)
+                        info_condensin.label_loopassociated(oridx)=1;
+                    end
+                    if val<initval.psf_est;  %localized with
+                        info_condensin.label_generaledgelabel(oridx)=labl;
+                    end
+                 dum=1;   
+                end
+                dum=1;
+            end
+        end
+        dum=1;
+        
+        
+        
+            
+            
+            
+        

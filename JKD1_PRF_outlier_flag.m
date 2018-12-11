@@ -1,4 +1,4 @@
-function [flag,cleandata]=JKD1_PRF_Outlier_Flag(data,tolerance,sigchange,how,sho);
+function [flag,cleandata]=JKD1_PRF_outlier_flag(data,tolerance,sigchange,how,sho);
 % 'Use this section for a Quicksheet'
  %------------------------------------------------------------------
     %this function is meant to find a representative value for a standard
