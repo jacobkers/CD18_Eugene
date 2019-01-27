@@ -1,23 +1,19 @@
 function A030_BoxTracker
 close all;
-figure(1);
+
 
 loaddatatype='Sim';
 loaddatatype='ASCII';
-initval.boxhalfwidth=2;
-initval.tracklookahead=20;
+initval.tracklookahead=5;
 initval.smoothlookahead=10;
-clickit=1;
 
 switch loaddatatype
     case 'Sim'  %out of function
         trackmap=Simulate_it;        
     case 'ASCII'
-        expname='2019_01_22 non_interactive type';
-        % [no xL tL1 tL2 xR tR1 tR2]              
-        roistartstop=[ [9 68.155 2940 1E6 68.343 300 1E6];...
-                       [31 65.25 432 1E6 67.726 1450 1E6];...
-            ];
+        expname='2019_01_22 non_interactive type'; 
+        expname='Figure2Pannel'; 
+        [roistartstop]=Get_Roi_Props(expname);        
         datapath='D:\jkerssemakers\_Data\CD\2018_Eugene\';
         exppath=[datapath,'\',expname,'\'];
         outpath=strcat(datapath, 'matlabresults\',expname,'\');
@@ -26,10 +22,11 @@ switch loaddatatype
 end
 
 
-[Lroi,~]=size(roistartstop);
+[~,Lroi]=size(roistartstop);
 for roii=1:Lroi
     close all;
-    roino=roistartstop(roii,1);
+    figure(roii);
+    roino=roistartstop(roii).roino;
     Exp=strcat('ROI',num2str(roino));
     SaveName=char(strcat(outpath, Exp));
     datainpath=strcat(exppath,'M', num2str(roino),'\kymo_ImageJ\');       
@@ -37,44 +34,34 @@ for roii=1:Lroi
     trackmap=dlmread(source);
     [ff,cc]=size(trackmap);
     savit=1;
- 
-    pcolor(trackmap); colormap hot, shading flat; hold on;
-    if clickit
-    clickpoints=ginput(4);  %click [no xL tL1 tL2 xR tR1 tR2]% 
-    thisroistartstop=[
-            [roino  clickpoints(1,1) clickpoints(1,2) clickpoints(2,2)...
-                    clickpoints(3,1) clickpoints(3,2) clickpoints(4,2)] 
-            ];        
-    else
-        thisroistartstop=roistartstop(roii,:);
-    end
+    thisroistartstop=roistartstop(roii);
     %clean it
-    if thisroistartstop(4)>ff-initval.tracklookahead,
-        thisroistartstop(4)=ff-initval.tracklookahead;
-    end
-    if thisroistartstop(7)>ff-initval.tracklookahead,
-        thisroistartstop(7)=ff-initval.tracklookahead;
-    end   
-    
-    colormap(bone);
-    plot(thisroistartstop(2),thisroistartstop(3),'ro-', 'MarkerFaceColor', 'r');
-    plot(thisroistartstop(5),thisroistartstop(6),'bo-', 'MarkerFaceColor', 'b'); 
-    plot([5 cc-5]',[thisroistartstop(4) thisroistartstop(4)]','wo-');
-    plot([5 cc-5]',[thisroistartstop(7) thisroistartstop(7)]','wo-');
+    pcolor(trackmap); colormap(bone); shading flat; hold on;
+    plot(thisroistartstop.startx,thisroistartstop.startt,'ro', 'MarkerFaceColor', 'r');
     
     pause(0.5);
     close(gcf);
  
-    initval.tetherlevel=Get_tetherlevel(trackmap);
-    for jj=1:2 %initialize loop info
-        xj=thisroistartstop(2+(jj-1)*3); %first x for trace;
-        fj=thisroistartstop(3+(jj-1)*3); %first frame;
-        [~,Ij,~]=Get_box_intensity(trackmap,xj,fj,initval,0); %first I
+    
+    [tetherstart,tetherstop]=Get_tetheredges(trackmap);
+    initval.tetherlevel=Get_tetherlevel(trackmap,tetherstart,tetherstop);
+    
+    
+    
+    Nloops=length(thisroistartstop.startx);
+    looptraces=struct('Lx',[]);
+    for jj=1:Nloops %initialize loop info
+        xj=thisroistartstop.startx(jj); %first x for trace;
+        fj=thisroistartstop.startt(jj); %first frame;
+        %get first box
+        boxprops.boxhalfwidth=thisroistartstop.loopanalysishalfwidth(jj);
+        boxprops.cutlevel=initval.tetherlevel;
+        boxprops.lookahead=0;
+        [~,Ij,~]=Get_box_intensity(trackmap,xj,fj,boxprops); %first I
         looptraces(jj).Lx=xj;
         looptraces(jj).frame=fj;
-        looptraces(jj).LI=Ij;
-    end 
-    
+        looptraces(jj).I_loop=Ij;
+    end     
     for ii=1:ff
         %if mod(300,ii), disp(num2str(ii));end;
         looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initval);
@@ -84,18 +71,26 @@ for roii=1:Lroi
     subplot(1,2,1);
     pcolor(trackmap); colormap bone, shading flat; hold on;
     colormap(bone);
-    plot(looptraces(1).Lx+0.5,looptraces(1).frame+0.5,'r-', 'MarkerFaceColor', 'w');
-    plot(looptraces(2).Lx+0.5,looptraces(2).frame+0.5,'b-', 'MarkerFaceColor', 'w');
-    ylabel('frameno, a.u.');
-    xlabel('position, a.u.');
+    for jj=1:Nloops %initialize loop info
+        plot(looptraces(jj).Lx+0.5,looptraces(jj).frame+0.5,'r-');
+        %length()
+        plot(looptraces(jj).curvestart+0.5,looptraces(jj).frame+0.5,'y-');
+        plot(looptraces(jj).curvestop+0.5,looptraces(jj).frame+0.5,'y-');
+        ylabel('frameno, a.u.');
+        xlabel('position, a.u.');
 
-    subplot(1,2,2);
-    plot(looptraces(1).frame,looptraces(1).LI,'r-', 'MarkerFaceColor', 'w'); hold on;
-    plot(looptraces(2).frame,looptraces(2).LI,'b-', 'MarkerFaceColor', 'w'); hold on;
-    xlabel('frameno, a.u.');
-    ylabel('loop intensity, % of total');
-    legend('loop 1', 'loop 2');
-
+        subplot(1,2,2);
+        plot(looptraces(jj).frame,looptraces(jj).I_loop,'r-'); hold on;
+        plot(looptraces(jj).frame,looptraces(jj).I_left,'m-'); hold on;
+        plot(looptraces(jj).frame,looptraces(jj).I_right,'b-'); hold on;
+%         checksum=looptraces(jj).I_loop+...
+%                   looptraces(jj).I_left+...
+%                   looptraces(jj).I_right;
+%         plot(looptraces(jj).frame,checksum,'b-'); hold on;
+        legend('loop','left','right');
+        xlabel('frameno, a.u.');
+        ylabel('loop intensity, % of total');
+    end
 
     if savit
     save(strcat(SaveName, '_pairtrackresults.mat'),... 
@@ -109,36 +104,66 @@ end
 function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initval);
     
     %[no xL tL1 tL2 xR tR1 tR2]% 
-    hf=initval.boxhalfwidth;    
-    for iL=1:2 %for each loop
-        loopexist=(ii>=thisroistartstop(3+(iL-1)*3)&(ii<thisroistartstop(4+(iL-1)*3)));
+    Nloops=length(thisroistartstop.startx);
+    
+    for iL=1:Nloops %for each loop
+        crp=max([initval.smoothlookahead initval.tracklookahead]);
+        loopstart=thisroistartstop.startt(iL);
+        loopstop=thisroistartstop.stopt(iL)-crp;
+        loopexist=(ii>=loopstart&(ii<loopstop));
         if loopexist  %update the loop position
             i_cur=length(looptraces(iL).Lx); %next loop index            
             x_cur=looptraces(iL).Lx(i_cur);
             fr_nxt=looptraces(iL).frame(i_cur)+1;
-            [~,~,box]=Get_box_intensity(trackmap,x_cur,fr_nxt,initval,initval.tracklookahead); %get next box
-            
+             %track box
+            boxprops.boxhalfwidth=thisroistartstop.trackhalfwidth(iL);
+            boxprops.cutlevel=initval.tetherlevel;
+            boxprops.lookahead=initval.tracklookahead;
+            [~,~,box]=Get_box_intensity(trackmap,x_cur,fr_nxt,boxprops); %get next box
+            box(box<initval.tetherlevel)=initval.tetherlevel;  %padding off-tether
+            box=box-min(box);
             %new position
-            bx=box-min(box);
+            
+            %box=box-min(box);
+            
             mbox=GaussMask(box,0.5);
             [com,comc]=Get_1DCOM(mbox);
             x_nxt=x_cur+comc;   %next position
             
-            %for all other loops: check minimum distance
+
+            %get intensity of newly tracked box; more smoothened
+            boxprops.boxhalfwidth=thisroistartstop.loopanalysishalfwidth(iL);
+            boxprops.cutlevel=initval.tetherlevel;
+            boxprops.lookahead=initval.smoothlookahead;
+            [~,Iperc,box_sm,lo,hi,box_full]=Get_box_intensity(trackmap,x_nxt,fr_nxt,boxprops);           
+            [strt,stp,~]=Get_edgeslength(box_sm,'loop');
             
-%             if 0   %add auto-repulsion               
-%                 if (abs_Rx-abs_Lx)<2*hf
-%                     repulsion=(2*hf-(abs_Rx-abs_Lx))/2;
-%                     abs_Rx=abs_Rx+repulsion;
-%                     abs_Lx=abs_Lx-repulsion;
-%                 end
-%             end            
-            [~,Iperc,~]=Get_box_intensity(trackmap,x_nxt,fr_nxt,initval,initval.smoothlookahead);           
+            %Get corrected left and right intensities
+            %new position from smoothened box
+            box_sm(box_sm<initval.tetherlevel)=initval.tetherlevel;  %padding off-tether
+            box_sm=box_sm-min(box_sm);
+            mbox_sm=GaussMask(box_sm,0.5);
+            [com_sm,~]=Get_1DCOM(mbox_sm);           
+            mid=com_sm-1+lo;
+            box_res=box_full;
+            box_res(lo:hi)=box_res(lo:hi)-box_sm;
+            box_left=box_res(1:round(mid));
+            box_right=box_res(round(mid)+1:end);
             
+            left_I=100*sum(box_left)/sum(box_full);
+            right_I=100*sum(box_right)/sum(box_full);
+            
+            if i_cur+1>250
+                dum=1;
+            end
             %update trace
             looptraces(iL).frame(i_cur+1)=fr_nxt;
             looptraces(iL).Lx(i_cur+1)=x_nxt;
-            looptraces(iL).LI(i_cur+1)=Iperc;  
+            looptraces(iL).I_loop(i_cur+1)=Iperc;
+            looptraces(iL).I_left(i_cur+1)=left_I;
+            looptraces(iL).I_right(i_cur+1)=right_I;
+            looptraces(iL).curvestart(i_cur+1)=lo-1+strt;
+            looptraces(iL).curvestop(i_cur+1)=lo-1+stp;
 
              if 0% iL==2
              figure(2);
@@ -151,6 +176,7 @@ function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initv
             end
         end
     end
+    
     
     function [com,comc]=Get_1DCOM(soi);
         %Get one-dimensional center of mass (as offset from center)
@@ -165,24 +191,38 @@ function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initv
         comc=max([-lp/2 comc]); comc=min([lp/2 comc]); %just to be sure
 
          
-  function [Iperc,Iperc_excess,box]=Get_box_intensity(trackmap,xx,fr,initval,lookahead);
+  function [Iperc,Iperc_excess,box,lo,hi,box_full]=Get_box_intensity(trackmap,xx,fr,boxprops);
         [~,cc]=size(trackmap);
         fr=round(fr);
-        hf=initval.boxhalfwidth;      
+        hf=boxprops.boxhalfwidth;      
         lo=round(max([1 xx-hf])); 
         hi=round(min([cc xx+hf]));        
-        if lookahead>0
-            squbox=trackmap(fr:fr+lookahead,lo:hi);
-            maskline=fliplr(linspace(0.1,1,lookahead+1));
+        if boxprops.lookahead>0
+            squbox=trackmap(fr:fr+boxprops.lookahead,lo:hi);
+            squbox_full=trackmap(fr:fr+boxprops.lookahead,:);
+            
+            maskline=fliplr(linspace(0.1,1,boxprops.lookahead+1));
             maskline=maskline/sum(maskline);
+            
             squmask=repmat(maskline',1,hi-lo+1);
+            squmask_full=repmat(maskline',1,cc);
+            
             box=sum(squbox.*squmask);
+            box_full=sum(squbox_full.*squmask_full);
         else
             box=trackmap(fr,lo:hi);
+            box_full=trackmap(fr,1:cc);
         end
+        box_full=box_full-min(box_full);
+        
+        %to avoid dark background issues
+        box(box<boxprops.cutlevel)=boxprops.cutlevel;
+        
+        
         Irw=sum(box);
-        Irw_excess=Irw-initval.tetherlevel*length(box);
-        Itotal=sum(trackmap(fr,:));
+        Irw_excess=Irw-boxprops.cutlevel*length(box);
+        
+        Itotal=sum(box_full);
         Iperc=100*Irw/Itotal;
         Iperc_excess=100*Irw_excess/Itotal;
 
@@ -195,9 +235,9 @@ function ar=GaussMask(ar,sigma)
     ax=linspace(-x0,x0,lar);
     ar=ar.*exp(-(ax/sig).^2);
     
- function tetherbackgroundlevel=Get_tetherlevel(trackmap);   
+ function tetherbackgroundlevel=Get_tetherlevel(trackmap,tetherstart,tetherstop);   
     [rr,cc]=size(trackmap);
-     midpart=trackmap(:,round(cc/4):round(3*cc/4));
+     midpart=trackmap(:,tetherstart+5:tetherstop-5);
      tetherbackgroundlevel=median(midpart(:));
      dum=1;
     
@@ -220,4 +260,118 @@ function ar=GaussMask(ar,sigma)
            end
         end
         trackmap=kymo;  
+        
+     function [tetherstart,tetherstop]=Get_tetheredges(trackmap)
+        [ff,cc]=size(trackmap);
+            %get the average tether position (assume it is fixed)
+        all_tetheredges=zeros(ff,2);
+        for jj=1:ff  
+            prf_res=trackmap(jj,:);
+            prf_res=prf_res-min(prf_res);
+            [t_strt,t_stp,~]=Get_edgeslength(prf_res,'tether');
+            all_tetheredges(jj,:)=[t_strt t_stp];
+        end
+        tetherstart=nanmedian(all_tetheredges(:,1));
+        tetherstop=nanmedian(all_tetheredges(:,2));
+          dum=1; 
+        
+
+ function [curvestart,curvestop,curveok]=Get_edgeslength(prf_res, type_of_profile);
+    %function uses 'shaved off' profile to find start and stop
+    tresval=0.4;
+    Lp=length(prf_res); axz=1:Lp;
+        
+    [lo_L,ixL]=min(prf_res(1:ceil(Lp/2)));
+    [lo_R,ixR]=min(prf_res(ceil(Lp/2):end)); ixR=ixR+ceil(Lp/2)-1;
+    slopefit=polyval(polyfit([ixL ixR],[lo_L lo_R],1),axz);
     
+    prf_res_ft=prf_res-slopefit;
+    
+    switch type_of_profile
+        case 'tether' %main level, assuming most of profile is tether 
+            main_lev=median(prf_res_ft);
+            %subplot(2,2,2);
+        case 'loop' %%FWHM level, assuming relatively compact loop 
+            main_lev=0.5*max(prf_res_ft);
+            %subplot(2,2,4);
+    end
+    lo=min(prf_res_ft);
+    sel=find(prf_res_ft>(lo+tresval*(main_lev-lo)));
+    
+    if ~isempty(sel);
+        curvestart=min(sel);     
+        curvestop=max(sel);
+        curveok=1;
+    else
+        curvestart=NaN;     
+        curvestop=NaN;
+        curveok=0;
+    end
+
+    if 0      
+        plot(prf_res,'b-'); hold on;
+        plot(slopefit,'b-');
+        plot(prf_res_ft,'r');       
+        plot(0*prf_res+main_lev,'r-');
+        title(type_of_profile);
+        stem(curvestart,prf_res_ft(curvestart),'ro');
+        stem(curvestop,prf_res_ft(curvestop),'ro');
+        legend( '\fontsize{6} residu','\fontsize{6} minima fit',...
+                '\fontsize{6} corrected','\fontsize{6} mean',...
+                '\fontsize{6}edges');
+        xlabel('positition, pixel units');
+        ylabel('fluorescence intensity, a.u.');
+        pause(0.5);        
+        [~]=ginput(1);
+        hold off;
+    end         
+          
+          
+     function roistartstop=Get_Roi_Props(expname);
+        switch expname
+            case '2019_01_22 non_interactive type'
+                roistartstop(1).roino=9;
+                roistartstop(1).startx=[68.155 68.343];
+                roistartstop(1).startt=[2940 300];
+                roistartstop(1).stopt=[1E6 1E6];
+                roistartstop(1).trackhalfwidth=2;
+                roistartstop(1).loopanalysishalfwidth=2;
+                
+                roistartstop(2).roino=31;
+                roistartstop(2).startx=[65.25 67.726];
+                roistartstop(2).startt=[432 1450];
+                roistartstop(2).stopt=[1E6 1E6]; 
+                roistartstop(1).trackhalfwidth=2;
+                roistartstop(2).loopanalysishalfwidth=2;
+            case 'Figure2Pannel' 
+                if 0
+                 roistartstop(1).roino=38;
+                 roistartstop(1).startx=57.6326;
+                 roistartstop(1).startt=1;
+                 roistartstop(1).stopt=2301;
+                 roistartstop(1).trackhalfwidth=7;
+                 roistartstop(1).loopanalysishalfwidth=7; 
+                
+                else
+                 roistartstop(1).roino=3;
+                 roistartstop(1).startx=15.3287;
+                 roistartstop(1).startt=23.7081;
+                 roistartstop(1).stopt=807;
+                 roistartstop(1).trackhalfwidth=8;
+                 roistartstop(1).loopanalysishalfwidth=8;
+                 
+                 roistartstop(2).roino=26;
+                 roistartstop(2).startx=51.9724;
+                 roistartstop(2).startt=352.8061;
+                 roistartstop(2).stopt=5683;
+                 roistartstop(2).trackhalfwidth=10;
+                 roistartstop(2).loopanalysishalfwidth=12;
+                 
+                 roistartstop(3).roino=38;
+                 roistartstop(3).startx=57.6326;
+                 roistartstop(3).startt=1;
+                 roistartstop(3).stopt=2301;
+                 roistartstop(3).trackhalfwidth=7;
+                 roistartstop(3).loopanalysishalfwidth=10; 
+                end
+        end
