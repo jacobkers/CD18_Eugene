@@ -5,7 +5,7 @@ close all;
 loaddatatype='Sim';
 loaddatatype='ASCII';
 initval.tracklookahead=5;
-initval.smoothlookahead=10;
+initval.smoothlookahead=5;
 
 switch loaddatatype
     case 'Sim'  %out of function
@@ -45,7 +45,8 @@ for roii=1:Lroi
     
     [tetherstart,tetherstop]=Get_tetheredges(trackmap);
     initval.tetherlevel=Get_tetherlevel(trackmap,tetherstart,tetherstop);
-    
+    initval.tetherstart=tetherstart;
+    initval.tetherstop=tetherstop;
     
     
     Nloops=length(thisroistartstop.startx);
@@ -60,7 +61,7 @@ for roii=1:Lroi
         [~,Ij,~]=Get_box_intensity(trackmap,xj,fj,boxprops); %first I
         looptraces(jj).Lx=xj;
         looptraces(jj).frame=fj;
-        looptraces(jj).I_loop=Ij;
+        looptraces(jj).I_mid=Ij;
     end     
     for ii=1:ff
         %if mod(300,ii), disp(num2str(ii));end;
@@ -71,7 +72,7 @@ for roii=1:Lroi
     subplot(1,2,1);
     pcolor(trackmap); colormap bone, shading flat; hold on;
     colormap(bone);
-    for jj=1:Nloops %initialize loop info
+    for jj=1:Nloops 
         plot(looptraces(jj).Lx+0.5,looptraces(jj).frame+0.5,'r-');
         %length()
         plot(looptraces(jj).curvestart+0.5,looptraces(jj).frame+0.5,'y-');
@@ -80,9 +81,10 @@ for roii=1:Lroi
         xlabel('position, a.u.');
 
         subplot(1,2,2);
-        plot(looptraces(jj).frame,looptraces(jj).I_loop,'r-'); hold on;
+        plot(looptraces(jj).frame,looptraces(jj).I_mid,'y-'); hold on;
         plot(looptraces(jj).frame,looptraces(jj).I_left,'m-'); hold on;
         plot(looptraces(jj).frame,looptraces(jj).I_right,'b-'); hold on;
+        plot(looptraces(jj).frame,looptraces(jj).checksum,'k-'); hold on;
 %         checksum=looptraces(jj).I_loop+...
 %                   looptraces(jj).I_left+...
 %                   looptraces(jj).I_right;
@@ -94,10 +96,10 @@ for roii=1:Lroi
 
     if savit
     save(strcat(SaveName, '_pairtrackresults.mat'),... 
-                                  'looptraces');
-
+                                  'looptraces','initval');
     saveas(gcf, strcat(SaveName, '_pairtrackresults.svg'));
     saveas(gcf, strcat(SaveName, '_pairtrackresults.jpg'));
+    saveas(gcf, strcat(SaveName, '_pairtrackresults.fig'));
     end
 end
 
@@ -135,8 +137,10 @@ function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initv
             boxprops.boxhalfwidth=thisroistartstop.loopanalysishalfwidth(iL);
             boxprops.cutlevel=initval.tetherlevel;
             boxprops.lookahead=initval.smoothlookahead;
-            [~,Iperc,box_sm,lo,hi,box_full]=Get_box_intensity(trackmap,x_nxt,fr_nxt,boxprops);           
+            [~,~,box_sm,boxlo,boxhi,box_full]=Get_box_intensity(trackmap,x_nxt,fr_nxt,boxprops);           
             [strt,stp,~]=Get_edgeslength(box_sm,'loop');
+            loopedge_lft=boxlo-1+strt;
+            loopedge_rgt=boxlo-1+stp;
             
             %Get corrected left and right intensities
             %new position from smoothened box
@@ -144,26 +148,41 @@ function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initv
             box_sm=box_sm-min(box_sm);
             mbox_sm=GaussMask(box_sm,0.5);
             [com_sm,~]=Get_1DCOM(mbox_sm);           
-            mid=com_sm-1+lo;
+            mid=com_sm-1+boxlo;
+            
+            
             box_res=box_full;
-            box_res(lo:hi)=box_res(lo:hi)-box_sm;
-            box_left=box_res(1:round(mid));
-            box_right=box_res(round(mid)+1:end);
+            box_res(boxlo:boxhi)=box_res(boxlo:boxhi)-box_sm;
             
-            left_I=100*sum(box_left)/sum(box_full);
-            right_I=100*sum(box_right)/sum(box_full);
+            %note:sum(box_res)+sum(box_sm)=sum(box_full)
             
+            box_left=box_res(1:loopedge_lft-1);
+            box_stem=box_res(loopedge_lft:loopedge_rgt);
+            box_right=box_res(loopedge_rgt+1:end);
+            
+            %note: sum(box_res)=sum(box_left)+sum(box_stem)+sum(box_right)
+            
+            looptraces(iL).frame(i_cur+1)=fr_nxt;
+            looptraces(iL).curvestart(i_cur+1)=boxlo-1+strt;
+            looptraces(iL).Lx(i_cur+1)=x_nxt;           
+            looptraces(iL).curvestop(i_cur+1)=boxlo-1+stp;
+            looptraces(iL).I_left(i_cur+1)=100*sum(box_left)/sum(box_full);
+            looptraces(iL).I_right(i_cur+1)=100*sum(box_right)/sum(box_full);
+            looptraces(iL).I_stem(i_cur+1)=100*sum(box_stem)/sum(box_full);
+            looptraces(iL).I_hat(i_cur+1)=100*sum(box_sm)/sum(box_full);;
+            looptraces(iL).I_mid(i_cur+1)= looptraces(iL).I_hat(i_cur+1)+...
+                                           looptraces(iL).I_stem(i_cur+1);
+            looptraces(iL).checksum(i_cur+1)=...
+                    looptraces(iL).I_left(i_cur+1)+...
+                    looptraces(iL).I_mid(i_cur+1)+...
+                    looptraces(iL).I_right(i_cur+1);                           
             if i_cur+1>250
                 dum=1;
             end
             %update trace
-            looptraces(iL).frame(i_cur+1)=fr_nxt;
-            looptraces(iL).Lx(i_cur+1)=x_nxt;
-            looptraces(iL).I_loop(i_cur+1)=Iperc;
-            looptraces(iL).I_left(i_cur+1)=left_I;
-            looptraces(iL).I_right(i_cur+1)=right_I;
-            looptraces(iL).curvestart(i_cur+1)=lo-1+strt;
-            looptraces(iL).curvestop(i_cur+1)=lo-1+stp;
+            
+
+            
 
              if 0% iL==2
              figure(2);
