@@ -71,7 +71,7 @@ for roii=1:Lroi
 
     subplot(1,2,1);
     pcolor(trackmap); colormap bone, shading flat; hold on;
-    colormap(bone);
+    colormap(bone); 
     for jj=1:Nloops 
         plot(looptraces(jj).Lx+0.5,looptraces(jj).frame+0.5,'r-');
         %length()
@@ -79,12 +79,14 @@ for roii=1:Lroi
         plot(looptraces(jj).curvestop+0.5,looptraces(jj).frame+0.5,'y-');
         ylabel('frameno, a.u.');
         xlabel('position, a.u.');
-
-        subplot(1,2,2);
+    end
+    subplot(1,2,2);
+    for jj=1:Nloops
         plot(looptraces(jj).frame,looptraces(jj).I_mid,'y-'); hold on;
         plot(looptraces(jj).frame,looptraces(jj).I_left,'m-'); hold on;
         plot(looptraces(jj).frame,looptraces(jj).I_right,'b-'); hold on;
         plot(looptraces(jj).frame,looptraces(jj).checksum,'k-'); hold on;
+    end
 %         checksum=looptraces(jj).I_loop+...
 %                   looptraces(jj).I_left+...
 %                   looptraces(jj).I_right;
@@ -92,7 +94,7 @@ for roii=1:Lroi
         legend('loop','left','right');
         xlabel('frameno, a.u.');
         ylabel('loop intensity, % of total');
-    end
+    
 
     if savit
     save(strcat(SaveName, '_pairtrackresults.mat'),... 
