@@ -9,7 +9,7 @@ datapath='D:\jkerssemakers\_Data\CD\2018_Eugene\';
 exppath=[datapath,'\',expname,'\'];
 outpath=strcat(datapath, 'matlabresults\',expname,'\');
 textfile='Kymograph_DNA.txt';
-roistartstop.roino=38;  %3 26 %38
+roistartstop.roino=3;  %3 26 %38
 
 close all;
 Exp=strcat('ROI',num2str(roistartstop.roino));

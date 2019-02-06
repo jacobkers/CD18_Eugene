@@ -363,13 +363,13 @@ function ar=GaussMask(ar,sigma)
                 roistartstop(1).trackhalfwidth=2;
                 roistartstop(2).loopanalysishalfwidth=2;
             case 'Figure2Pannel' 
-                if 0
-                 roistartstop(1).roino=38;
-                 roistartstop(1).startx=57.6326;
-                 roistartstop(1).startt=1;
-                 roistartstop(1).stopt=2301;
-                 roistartstop(1).trackhalfwidth=7;
-                 roistartstop(1).loopanalysishalfwidth=7; 
+                if 1
+                 roistartstop(1).roino=3;
+                 roistartstop(1).startx=[15.1611 72.8112];
+                 roistartstop(1).startt=[32.0724 1.9416];
+                 roistartstop(1).stopt=[807 158.2453];
+                 roistartstop(1).trackhalfwidth=[6 4];
+                 roistartstop(1).loopanalysishalfwidth=[6 4]; 
                 
                 else
                  roistartstop(1).roino=3;
@@ -391,6 +391,6 @@ function ar=GaussMask(ar,sigma)
                  roistartstop(3).startt=1;
                  roistartstop(3).stopt=2301;
                  roistartstop(3).trackhalfwidth=7;
-                 roistartstop(3).loopanalysishalfwidth=10; 
+                 roistartstop(3).loopanalysishalfwidth=10;     
                 end
         end
