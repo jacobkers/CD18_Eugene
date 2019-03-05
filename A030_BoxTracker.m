@@ -1,59 +1,37 @@
 function A030_BoxTracker
 close all;
 
+expname='Figure2Pannel'; 
+initval=A001_Initialize_BoxTracker(expname);
+[~,Lroi]=size(initval.roistartstop);
 
-loaddatatype='Sim';
-loaddatatype='ASCII';
-initval.tracklookahead=5;
-initval.smoothlookahead=5;
-
-switch loaddatatype
-    case 'Sim'  %out of function
-        trackmap=Simulate_it;        
-    case 'ASCII'
-        expname='2019_01_22 non_interactive type'; 
-        expname='Figure2Pannel'; 
-        [roistartstop]=Get_Roi_Props(expname);        
-        datapath='D:\jkerssemakers\_Data\CD\2018_Eugene\';
-        exppath=[datapath,'\',expname,'\'];
-        outpath=strcat(datapath, 'matlabresults\',expname,'\');
-        textfile='Kymograph_DNA.txt';
-        if ~isdir(outpath), mkdir(outpath); end
-end
-
-
-[~,Lroi]=size(roistartstop);
+%%  work trhough all ROIs
 for roii=1:Lroi
     close all;
     figure(roii);
-    roino=roistartstop(roii).roino;
-    Exp=strcat('ROI',num2str(roino));
-    SaveName=char(strcat(outpath, Exp));
-    datainpath=strcat(exppath,'M', num2str(roino),'\kymo_ImageJ\');       
-    source=[ datainpath, textfile];
-    trackmap=dlmread(source);
-    [ff,cc]=size(trackmap);
+    
+    %% load a region-of-interest kymograph
     savit=1;
-    thisroistartstop=roistartstop(roii);
-    %clean it
-    pcolor(trackmap); colormap(bone); shading flat; hold on;
-    plot(thisroistartstop.startx,thisroistartstop.startt,'ro', 'MarkerFaceColor', 'r');
-    
-    pause(0.5);
-    close(gcf);
- 
-    
+    roino=initval.roistartstop(roii).roino;
+    Exp=strcat('ROI',num2str(roino));
+    SaveName=char(strcat(initval.expi_outpath, Exp));
+    datainpath=strcat(initval.expi_inpath,'M', num2str(roino),'\kymo_ImageJ\');       
+    source=[datainpath, initval.kymofile];
+    trackmap=dlmread(source);
+    %% get general properties, such as tether edges
+    [ff,cc]=size(trackmap);
+    thisroistartstop=initval.roistartstop(roii);   
     [tetherstart,tetherstop]=Get_tetheredges(trackmap);
     initval.tetherlevel=Get_tetherlevel(trackmap,tetherstart,tetherstop);
     initval.tetherstart=tetherstart;
-    initval.tetherstop=tetherstop;
-    
-    
+    initval.tetherstop=tetherstop;       
     Nloops=length(thisroistartstop.startx);
     looptraces=struct('Lx',[]);
-    for jj=1:Nloops %initialize loop info
+    
+    %% initialize loop info
+    for jj=1:Nloops 
         xj=thisroistartstop.startx(jj); %first x for trace;
-        fj=thisroistartstop.startt(jj); %first frame;
+        fj=thisroistartstop.pre_t(jj); %first frame;
         %get first box
         boxprops.boxhalfwidth=thisroistartstop.loopanalysishalfwidth(jj);
         boxprops.cutlevel=initval.tetherlevel;
@@ -62,13 +40,15 @@ for roii=1:Lroi
         looptraces(jj).Lx=xj;
         looptraces(jj).frame=fj;
         looptraces(jj).I_mid=Ij;
-    end     
+    end
+    
+    %% now, analyze the kymograph
     for ii=1:ff
-        %if mod(300,ii), disp(num2str(ii));end;
+        if (mod(ii,300)==0), disp(num2str(ii));end;
         looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initval);
     end
 
-
+    %% Plot menu
     subplot(1,2,1);
     pcolor(trackmap); colormap bone, shading flat; hold on;
     colormap(bone); 
@@ -105,21 +85,25 @@ for roii=1:Lroi
     end
 end
 
-function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initval);
-    
+function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initval);   
     %[no xL tL1 tL2 xR tR1 tR2]% 
-    Nloops=length(thisroistartstop.startx);
-    
+    Nloops=length(thisroistartstop.startx);   
     for iL=1:Nloops %for each loop
         crp=max([initval.smoothlookahead initval.tracklookahead]);
-        loopstart=thisroistartstop.startt(iL);
-        loopstop=thisroistartstop.stopt(iL)-crp;
-        loopexist=(ii>=loopstart&(ii<loopstop));
-        if loopexist  %update the loop position
+        loopstandstart=thisroistartstop.pre_t(iL);
+        loopwalkstart=thisroistartstop.startt(iL);
+        loopwalkstop=thisroistartstop.stopt(iL)-crp;
+        %% perform track analysis in predefined sections of loop
+        loopalife=(ii>=loopstandstart&(ii<loopwalkstop));
+        loopstands=(loopalife&(ii<loopwalkstart));
+        loopmoves=(loopalife&(ii>=loopwalkstart));
+      
+        
+        %% analyze the pre-set life slot of the loop   
+        if loopalife   
             i_cur=length(looptraces(iL).Lx); %next loop index            
             x_cur=looptraces(iL).Lx(i_cur);
             fr_nxt=looptraces(iL).frame(i_cur)+1;
-             %track box
             boxprops.boxhalfwidth=thisroistartstop.trackhalfwidth(iL);
             boxprops.cutlevel=initval.tetherlevel;
             boxprops.lookahead=initval.tracklookahead;
@@ -129,13 +113,18 @@ function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initv
             %new position
             
             %box=box-min(box);
-            
             mbox=GaussMask(box,0.5);
             [com,comc]=Get_1DCOM(mbox);
-            x_nxt=x_cur+comc;   %next position
-            
+            %% analyze the pre-loop time slot (were intensity is absent or low)
+            if loopstands
+                x_nxt=x_cur;   %next position; do not update
+            end
+            %% analyze the motion time slot (where the loop is active)
+            if loopmoves
+                x_nxt=x_cur+comc;   % update next position; no update!
+            end
 
-            %get intensity of newly tracked box; more smoothened
+            %% get intensity of newly tracked box; more smoothened
             boxprops.boxhalfwidth=thisroistartstop.loopanalysishalfwidth(iL);
             boxprops.cutlevel=initval.tetherlevel;
             boxprops.lookahead=initval.smoothlookahead;
@@ -150,9 +139,8 @@ function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initv
             box_sm=box_sm-min(box_sm);
             mbox_sm=GaussMask(box_sm,0.5);
             [com_sm,~]=Get_1DCOM(mbox_sm);           
-            mid=com_sm-1+boxlo;
-            
-            
+            mid=com_sm-1 +boxlo;
+         
             box_res=box_full;
             box_res(boxlo:boxhi)=box_res(boxlo:boxhi)-box_sm;
             
@@ -197,8 +185,7 @@ function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initv
             end
         end
     end
-    
-    
+     
     function [com,comc]=Get_1DCOM(soi);
         %Get one-dimensional center of mass (as offset from center)
         lp=length(soi);
@@ -212,34 +199,36 @@ function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initv
         comc=max([-lp/2 comc]); comc=min([lp/2 comc]); %just to be sure
 
          
-  function [Iperc,Iperc_excess,box,lo,hi,box_full]=Get_box_intensity(trackmap,xx,fr,boxprops);
-        [~,cc]=size(trackmap);
+  function [Iperc,Iperc_excess,box,lox,hix,box_full]=Get_box_intensity(trackmap,xx,fr,boxprops);
+        [tt,cc]=size(trackmap);
         fr=round(fr);
         hf=boxprops.boxhalfwidth;      
-        lo=round(max([1 xx-hf])); 
-        hi=round(min([cc xx+hf]));        
+        lox=round(max([1 xx-hf])); 
+        hix=round(min([cc xx+hf]));
+        lofr=round(max([1 fr])); 
+        hifr=round(min([tt fr+boxprops.lookahead]));
+        
         if boxprops.lookahead>0
-            squbox=trackmap(fr:fr+boxprops.lookahead,lo:hi);
-            squbox_full=trackmap(fr:fr+boxprops.lookahead,:);
+            squbox=trackmap(lofr:hifr,lox:hix);
+            squbox_full=trackmap(lofr:hifr,:);
             
-            maskline=fliplr(linspace(0.1,1,boxprops.lookahead+1));
+            maskline=fliplr(linspace(0.1,1,hifr-lofr+1));
             maskline=maskline/sum(maskline);
             
-            squmask=repmat(maskline',1,hi-lo+1);
+            squmask=repmat(maskline',1,hix-lox+1);
             squmask_full=repmat(maskline',1,cc);
             
             box=sum(squbox.*squmask);
             box_full=sum(squbox_full.*squmask_full);
         else
-            box=trackmap(fr,lo:hi);
+            box=trackmap(fr,lox:hix);
             box_full=trackmap(fr,1:cc);
         end
         box_full=box_full-min(box_full);
         
         %to avoid dark background issues
         box(box<boxprops.cutlevel)=boxprops.cutlevel;
-        
-        
+             
         Irw=sum(box);
         Irw_excess=Irw-boxprops.cutlevel*length(box);
         
@@ -262,25 +251,7 @@ function ar=GaussMask(ar,sigma)
      tetherbackgroundlevel=median(midpart(:));
      dum=1;
     
-  function trackmap=Simulate_it;
-        initval.BallParkRadius=1;
-        initval.PadCurves=1;
-        LT=100;
-        LX=50;
-        kymo=2*rand(LT,LX);
-        Taxis=1:LT;
-        Spotpos1=round((LX/3)*Taxis/LT+LX/3+1*rand(1,LT));
-        Spotpos2=round(Spotpos1+5+1*randn(1,LT));
-        for ii=1:LT
-           for jj=-3:3
-           val1=kymo(Taxis(ii),Spotpos1(ii)+jj);
-           kymo(Taxis(ii),Spotpos1(ii)+jj)=val1+(3-abs(jj))^2;
-
-           val2=kymo(Taxis(ii),Spotpos2(ii)+jj);
-           kymo(Taxis(ii),Spotpos2(ii)+jj)=val2+(3-abs(jj))^2;
-           end
-        end
-        trackmap=kymo;  
+  
         
      function [tetherstart,tetherstop]=Get_tetheredges(trackmap)
         [ff,cc]=size(trackmap);
@@ -347,52 +318,4 @@ function ar=GaussMask(ar,sigma)
         hold off;
     end         
           
-          
-     function roistartstop=Get_Roi_Props(expname);
-        switch expname
-            case '2019_01_22 non_interactive type'
-                roistartstop(1).roino=9;
-                roistartstop(1).startx=[68.155 68.343];
-                roistartstop(1).startt=[2940 300];
-                roistartstop(1).stopt=[1E6 1E6];
-                roistartstop(1).trackhalfwidth=2;
-                roistartstop(1).loopanalysishalfwidth=2;
-                
-                roistartstop(2).roino=31;
-                roistartstop(2).startx=[65.25 67.726];
-                roistartstop(2).startt=[432 1450];
-                roistartstop(2).stopt=[1E6 1E6]; 
-                roistartstop(1).trackhalfwidth=2;
-                roistartstop(2).loopanalysishalfwidth=2;
-            case 'Figure2Pannel' 
-                if 1
-                 roistartstop(1).roino=3;
-                 roistartstop(1).startx=[15.1611 72.8112];
-                 roistartstop(1).startt=[32.0724 1.9416];
-                 roistartstop(1).stopt=[807 158.2453];
-                 roistartstop(1).trackhalfwidth=[6 4];
-                 roistartstop(1).loopanalysishalfwidth=[6 4]; 
-                
-                else
-                 roistartstop(1).roino=3;
-                 roistartstop(1).startx=15.3287;
-                 roistartstop(1).startt=23.7081;
-                 roistartstop(1).stopt=807;
-                 roistartstop(1).trackhalfwidth=8;
-                 roistartstop(1).loopanalysishalfwidth=8;
-                 
-                 roistartstop(2).roino=26;
-                 roistartstop(2).startx=51.9724;
-                 roistartstop(2).startt=352.8061;
-                 roistartstop(2).stopt=5683;
-                 roistartstop(2).trackhalfwidth=10;
-                 roistartstop(2).loopanalysishalfwidth=12;
-                 
-                 roistartstop(3).roino=38;
-                 roistartstop(3).startx=57.6326;
-                 roistartstop(3).startt=1;
-                 roistartstop(3).stopt=2301;
-                 roistartstop(3).trackhalfwidth=7;
-                 roistartstop(3).loopanalysishalfwidth=10;     
-                end
-        end
+ 
