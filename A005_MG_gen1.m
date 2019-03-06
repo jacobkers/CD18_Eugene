@@ -585,5 +585,3 @@ imagesc(KymoBgBlNick');
 xlabel('Position (px)');
 title('Nicked Bg Bl');
 
-%
-run('MG_ana.m');

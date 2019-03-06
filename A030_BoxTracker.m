@@ -2,9 +2,15 @@ function A030_BoxTracker
 close all;
 
 expname='Figure2Pannel'; 
-initval=A001_Initialize_BoxTracker(expname);
-[~,Lroi]=size(initval.roistartstop);
+initval=A001_Initialize_Kymo(expname);
 
+
+%% if you want to override, redo single ROIs etc.
+%initval.roilist=[3 26 28]; 
+%initval.roilist=[3]; 
+
+%% get the ROIs to analyze
+Lroi=length(initval.roilist);
 %%  work trhough all ROIs
 for roii=1:Lroi
     close all;
@@ -12,28 +18,31 @@ for roii=1:Lroi
     
     %% load a region-of-interest kymograph
     savit=1;
-    roino=initval.roistartstop(roii).roino;
+    roino=initval.roilist(roii);
     Exp=strcat('ROI',num2str(roino));
+    LoadName=char(strcat(initval.expi_outpath, Exp,'_clickinfo'));
+    load(LoadName);
+    
+
     SaveName=char(strcat(initval.expi_outpath, Exp));
     datainpath=strcat(initval.expi_inpath,'M', num2str(roino),'\kymo_ImageJ\');       
     source=[datainpath, initval.kymofile];
     trackmap=dlmread(source);
     %% get general properties, such as tether edges
-    [ff,cc]=size(trackmap);
-    thisroistartstop=initval.roistartstop(roii);   
+    [ff,cc]=size(trackmap);   
     [tetherstart,tetherstop]=Get_tetheredges(trackmap);
     initval.tetherlevel=Get_tetherlevel(trackmap,tetherstart,tetherstop);
     initval.tetherstart=tetherstart;
     initval.tetherstop=tetherstop;       
-    Nloops=length(thisroistartstop.startx);
+    Nloops=length(roistartstop.start_x);
     looptraces=struct('Lx',[]);
     
     %% initialize loop info
     for jj=1:Nloops 
-        xj=thisroistartstop.startx(jj); %first x for trace;
-        fj=thisroistartstop.pre_t(jj); %first frame;
+        xj=roistartstop.start_x(jj); %first x for trace;
+        fj=roistartstop.pre_t(jj); %first frame;
         %get first box
-        boxprops.boxhalfwidth=thisroistartstop.loopanalysishalfwidth(jj);
+        boxprops.boxhalfwidth=roistartstop.loopanalysishalfwidth(jj);
         boxprops.cutlevel=initval.tetherlevel;
         boxprops.lookahead=0;
         [~,Ij,~]=Get_box_intensity(trackmap,xj,fj,boxprops); %first I
@@ -45,7 +54,7 @@ for roii=1:Lroi
     %% now, analyze the kymograph
     for ii=1:ff
         if (mod(ii,300)==0), disp(num2str(ii));end;
-        looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initval);
+        looptraces=Analyze_traces(looptraces,trackmap,roistartstop,ii,initval);
     end
 
     %% Plot menu
@@ -87,12 +96,12 @@ end
 
 function looptraces=Analyze_traces(looptraces,trackmap,thisroistartstop,ii,initval);   
     %[no xL tL1 tL2 xR tR1 tR2]% 
-    Nloops=length(thisroistartstop.startx);   
+    Nloops=length(thisroistartstop.start_x);   
     for iL=1:Nloops %for each loop
         crp=max([initval.smoothlookahead initval.tracklookahead]);
         loopstandstart=thisroistartstop.pre_t(iL);
-        loopwalkstart=thisroistartstop.startt(iL);
-        loopwalkstop=thisroistartstop.stopt(iL)-crp;
+        loopwalkstart=thisroistartstop.start_t(iL);
+        loopwalkstop=thisroistartstop.stop_t(iL)-crp;
         %% perform track analysis in predefined sections of loop
         loopalife=(ii>=loopstandstart&(ii<loopwalkstop));
         loopstands=(loopalife&(ii<loopwalkstart));
