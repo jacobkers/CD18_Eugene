@@ -1,0 +1,142 @@
+3-9
+	-github: re-organized code
+	-Boxtrack: running/clicking both datasets
+
+2-9
+	-boxtracker: better description of intensity measurement
+	-storing a 'regular loop' vs. 'Zloop' measurement
+
+24-7 
+	-build separate tools
+	-improve peak detection
+	-Boxtrack: changed box content analysis: 
+
+	
+6-3  Githubbed
+	A002 Shell: Clickit and Box  use now same inits, can be run separately and together
+
+
+5-3 githubbed
+	-boxtracker: allows now pre-start-t no-motion analysis to 	get zero intensities
+	-added kymo-analysis code
+	-started building shell
+
+19-2
+	-added pre-t to settings
+
+6-2 sent to github
+   -small patch in boxtracker
+	
+6-2  sent to Github
+	A005: 
+   -added original kymograph generator (MvL and others)
+	A030 just added to be sure
+
+28-1 
+	A030:
+	-included 'left', 'middle' (=stem&hat) 'right'
+	-added checksum that should be 100%
+
+27-1 send to Github &EK
+	A30: Expanding boxtracker to Fig2 panels;
+	added width, I_left, I_right
+	A28: separate click tool
+
+25-1
+A30: Boxtracker now works for any number of loops
+
+23-1 A30
+'Box tracker' code, follows two traces sparately
+
+12-12 A20
+	-added 'loopinfo.components' to store loop structure for later
+	-refined loop, residu, content contributions; 
+	-checked all adds to 100%
+	-ensured fields have correct lengths
+
+11-12 A20 sent to Github
+	-condensin-analysis: organized output structure
+     -condensin-analysis: added link to loop via 	distancelabels
+	-condensin-analysis: building histograms by category
+	-loop-analysis: tightened loop edges to inner peaks
+      -loop-analysis: save better 'mushroom section' intensity
+
+5-12 ; A20: sent to github
+	-refined loop edge detection 
+	(same as tether edge detection)
+	-more output 'loopinfo': 
+	left, middle  right, leftonly, rightonly
+	-cosmetics
+	-added evenmore molecules dataset
+	-improved low-loop analysis
+	-section division based on loop components 
+	  varies too much, changed to simple edges
+	-added loop to do all exps in one run
+
+27-11
+	-expand action options
+
+27-11 sent to Eugene & Github
+A020_KymoStackTrack
+-added: kymocleaning: flatten whole kymograph left-right, plus simple bleach correction
+-added: per profile: refined tether left and right: first flatten background on left and right minimum, otherwise some tethers turn out to long.
+-tested on 2 'pilot run' sets
+
+
+27-11 sent github. 
+A020_KymoStackTrack
+-added treshold-based tether start and stop to data; 
+ added this to plot panel
+-split analysis and plot loops for better structure
+-some cosmetics
+
+25-9 sent to github
+A020_KymoStackTrack main
+-improved loop level detection
+-add left/loop/right content data
+minor
+-changed result plot layout
+-added some tools
+
+
+24-9 sent to Github
+	A020_KymoStackTrack: set up 'More molecules'  test dat	
+	-reorganized labels for larger datasets
+	-simplified: silence cluster analysis, since we 
+		are only using the spots of the peeling method....
+	-automatically checks if condensin data is present
+
+
+5-9
+A020_KymoStackTrack after discussion with EK
+-tried edges loop on cumulative function, fails. back to tresholding fixed-level
+-added 3-pts subpixel peakpeeling
+
+
+
+5-9 sent to Github
+A020_KymoStackTrack: completed analysis line inc. savings, DNA loop properties. To be refined, works
+
+
+3-9
+made analysis multi-exp run (now 'Roi'and 'Roi3')
+split loop from DNA; simplify via cluster analysis
+small patches
+
+to do now: 
+fill in: loopinfo=Analyze_Loop(loop_kymo,residu_kymo);
+	-treshold above DNA, 
+	-then build clusters, get length etc.
+
+28-8 sent to Github
+	-added subpixel localization to multi-peak fitter
+
+
+
+27-8 sent to GitHub
+-set up multi-peak fitting on kymographs
+-made analysis bi-channel (condensin and DNA)
+-option to load imageJ-kymograph or make one from images
+-save all ploted data to mat file
+-allow multi-exp analysis
+-re-named some code
