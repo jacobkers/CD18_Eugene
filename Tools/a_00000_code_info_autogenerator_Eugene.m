@@ -36,7 +36,7 @@ projectdirlist={'2018_01_09 FlashTrack',...
                 '2019_31_12 Various Analyses',...
                 'Matlab_tools_CD18EK'};
            
-for pr=2:2 %length(projectdirlist)
+for pr=1:5 %length(projectdirlist)
     clc
     disp('AUTO-GENERATED CODE DESCRIPTION');
     disp('Jacob Kerssemakers')
@@ -47,10 +47,11 @@ for pr=2:2 %length(projectdirlist)
     do_singledir=0;  %Use this if you want to search one directory, no subdirectories
 
     dt = datestr(now, 'mmmm_dd_yyyy_HH_MM');
-    nm=strcat(mainprojectdir,'a0_code_info_',projectname,'_version_',dt); 
+    nm=strcat(singledir,'a0_code_info_',projectname); 
     diary(strcat(nm,'.txt'));    
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    disp(['Version : ',dt]);
     disp('__________________________________________________________');
     disp('Order of listing:');
     disp('Main programs: project-specific shell programs');  %A
