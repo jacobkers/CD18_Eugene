@@ -1,6 +1,12 @@
 function info_1=spots1_associate_labels(info_1,info_2,psf_est,corr);
-        %this function screens and labels  detected  spots
-%         info
+%JWJK_C:----[add ABCorC*----------------------------------------------------
+%Title: link condensin positions to DNA plectoneme positions -or not
+%Output: a flag indicating of the particular spot is associated
+%(co-localized) with a pot in the other channel.
+%References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+%:JWJK_C-----[add ABCorC*---------------------------------------------------
+    
+        %         info
                     % pos_frameno
                     % pos_X_pix
                     % pos_X_subpix

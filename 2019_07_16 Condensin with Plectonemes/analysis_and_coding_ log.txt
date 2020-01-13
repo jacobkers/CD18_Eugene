@@ -1,0 +1,9 @@
+4-9 
+	-reorganized codeA000 --A030 for better readability and preparing new analysis
+	-made a new A0001 shell program
+    -annotated subfunctions
+    -added the experiment '2019_09_02 NumberOfCondensinPerDNA' and did following:
+"Condensin density per DNA length was estimated as follows. First, movie frames were mapped into  intensity profiles along the tether length by subpixel interpolation mapping. This was done for both the DNA signal channel, as the condensin signal channel. Next, these profiles were collected in intensity vs. position-time kymographs. To measure the length of the DNA tether, we took the median of the DNA signal kymograph to get an average DNA profile; from this profile, we measured the profile edges to get a representative DNA length. 
+Condensin was counted by simple peak detection on the condensin profiles associated with each time point of the condensin kymograph. To suppress noise, the profiles were smoothed and only peaks above a certain treshold were counted. This treshold was taken as two times the standard deviation of the background noise.
+Next, we obtained the density of condensin per DNA lenght by summing the total number of detected condensins over all time points, and divided this by the total observed DNA length; the latter simply being the tether length multiplied by the observation time. To avoid biasing by surface effects, we excluded DNA tether length and condensin counts that were within 
+~400 nanometer of the tether attachment points. Thus, we obtained an average condensin density per tether. Finally, we repeated this measurement for ten separate tethers to find an average plus eor for the condensin density. " 

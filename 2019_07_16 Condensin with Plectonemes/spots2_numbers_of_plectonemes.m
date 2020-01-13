@@ -1,9 +1,11 @@
 function spots2_numbers_of_plectonemes(info_DNA,info_Cnd,kymo_DNA,kymo_Cnd,SaveName);
-    %for every spot:
-    %is first?
-    %it last?
-    %does it localize (with the other label)?
-    %is it part of a trace? (=not first, not last)
+%JWJK_B:----[add ABCorC*----------------------------------------------------
+%Title: %count plectonemes. 
+%Summary: %count the number of plectonemes per frame; allow for averaging
+%over a 'span'
+%Output: plot
+%References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+%:JWJK_B-----[add ABCorC*---------------------------------------------------
     
     %1 number of plectonemes per frame
     FF=max(info_DNA.pos_frameno);
