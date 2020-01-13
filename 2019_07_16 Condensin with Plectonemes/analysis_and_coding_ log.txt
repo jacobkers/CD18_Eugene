@@ -1,3 +1,13 @@
+13-1-2020 added to Github
+-some missing files on Github, synced things
+-build shared TEST directory on M, minimal data sets
+-test running A000_main; ok
+-re-sorting A002: every experiment is now collected in one function
+-to add: option Mukbef/condensin naming
+-added MukBEF ROI 1-2 test, works
+
+
+
 4-9 
 	-reorganized codeA000 --A030 for better readability and preparing new analysis
 	-made a new A0001 shell program

@@ -26,7 +26,7 @@ datapathin=init.datapathin;
 datapathout=init.datapathout;
 expname=init.expname;
 AllExp=init.AllExp;
-Channel_list=[{'DNA\'}, {'Condensin\'}];  
+
 generaldatapth=[datapathin,expname,'\'];
 outpath=strcat(datapathout, 'matlabresults\',expname,'\');
 if ~isdir(outpath), mkdir(outpath); end
@@ -43,7 +43,8 @@ Exp=strcat(init.roidirname,num2str(AllExp(roi)));
 %% Kymographs
 if actions.buildkymographs     
     if mod(roi,1)==0, disp(strcat('Building kymograph:',expname,':Exps to work through:',num2str(LE-roi+1)));end     
-    %% 1)make two kymographs                        
+    %% 1)make two kymographs 
+        Channel_list=[{'DNA\'}, {expinfo.labelname}];  
         dna_pth=char(strcat(generaldatapth, Exp,'\', Channel_list(1)));
         condensin_pth=char(strcat(generaldatapth, Exp,'\', Channel_list(2)));
         

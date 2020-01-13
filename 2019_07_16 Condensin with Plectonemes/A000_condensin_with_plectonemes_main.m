@@ -7,10 +7,11 @@ function A000_condensin_with_plectonemes_main
 
 %expi=1; %'2019_07_15 condensin_supercoil\'
 %expi=2; %'2019_07_26 condensin_supercoil_no_ATP\'
-expi=3; %'2019_09_02 NumberOfCondensinPerDNA\'
+%expi=3; %'2019_09_02 NumberOfCondensinPerDNA\'
+expi=4; %'2020_01_13 MukBEF_msd_wATP\'
 
 init=A001_condensin_with_plectonemes_init(expi);
 %init.AllExp=[1];        %short run 
 
-if 0, A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi);end
+if 1, A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi);end
 if 1, A030_Condensin_and_plectonemes_process_positions(init,expi) ;end

@@ -12,7 +12,127 @@ function expinfo=A002_Condensin_with_plectonemes_expinfo(expi,roi);
 
 %expinfo.channelshift=0.6022; %manually per ROI....  
 switch expi
-    case 1        %'2019_07_15 condensin_supercoil\' 
+    case 1,   expinfo=get_roiproperties_of_2019_07_15_condensin_supercoil(roi);          
+    case 2,   expinfo=get_roiproperties_of_2019_07_26_condensin_supercoil_no_ATP(roi);         
+    case 3,   expinfo=get_roiproperties_of_2019_09_02_NumberOfCondensinPerDNA(roi);  
+    case 4,   expinfo=get_roiproperties_of_2020_01_13_MukBEF_msd_wATP(roi);      
+end
+
+function expinfo=get_roiproperties_of_2020_01_13_MukBEF_msd_wATP(roi); 
+        %'2019_07_26 condensin_supercoil_no_ATP\'
+        expinfo.labelname='MukBEF';
+        expinfo.tres_pk_DNA=0.15;      %used for final peak selection; fraction of first 90%
+        expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
+        switch roi          
+           case 1 
+                      expinfo.endpoints_xy=[15 6 ; 14 86]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=25; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI....  
+            case 2
+                      expinfo.endpoints_xy=[10 14 ; 40 77]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=35; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI....          
+        end 
+
+
+function expinfo=get_roiproperties_of_2019_09_02_NumberOfCondensinPerDNA(roi);
+        expinfo.labelname='Condensin';
+        expinfo.tres_pk_DNA=0.15;      %used for final peak selection; fraction of first 90%
+        expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
+        switch roi
+            case 1
+                      expinfo.endpoints_xy=[11 26 ; 18 138]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=20; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+           case 2
+                      expinfo.endpoints_xy=[23 6 ; 12 101]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=18; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+            case 3
+                      expinfo.endpoints_xy=[25 5 ; 13 100]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=16; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+            case 4
+                      expinfo.endpoints_xy=[28 5 ; 18 69]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=26; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+            case 5
+                      expinfo.endpoints_xy=[20 2 ; 12 111]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=24; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+            case 6
+                      expinfo.endpoints_xy=[22 5 ; 11 81]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=24; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+            case 7
+                      expinfo.endpoints_xy=[10 5 ; 12 91]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=20; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+            case 8
+                      expinfo.endpoints_xy=[18 1 ; 10 106]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=22; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+            case 9
+                      expinfo.endpoints_xy=[19 9 ; 10 110]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=22; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+            case 10
+                      expinfo.endpoints_xy=[24 2 ; 8 107]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=16; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+        end
+        
+
+function expinfo=get_roiproperties_of_2019_07_26_condensin_supercoil_no_ATP(roi); 
+        %'2019_07_26 condensin_supercoil_no_ATP\'
+        expinfo.labelname='Condensin';
+        expinfo.tres_pk_DNA=0.15;      %used for final peak selection; fraction of first 90%
+        expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
+        switch roi          
+           case 1 
+                      expinfo.endpoints_xy=[27 2 ; 13 86]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=11; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI....  
+            case 2
+                      expinfo.endpoints_xy=[17 13 ; 25 116]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=8; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI....  
+            case 3
+                      expinfo.endpoints_xy=[16 11 ; 23 118]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=11; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI....  
+            case 4
+                      expinfo.endpoints_xy=[15 8 ; 26 107]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=11; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI....  
+            case 5
+                      expinfo.endpoints_xy=[9 8 ; 22 101]; %in image x1 y1 x2 y2   
+                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
+                      expinfo.kymowidth=11; %adjust with neighbours nearby
+                      expinfo.channelshift=0; %manually per ROI.... 
+
+        end 
+
+
+function expinfo=get_roiproperties_of_2019_07_15_condensin_supercoil(roi);
+        %'2019_07_15 condensin_supercoil\' 
+        expinfo.labelname='Condensin';
         expinfo.tres_pk_DNA=0.15;      %used for final peak selection; fraction of first 90%
         expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
         switch roi
@@ -80,92 +200,4 @@ switch expi
                   expinfo.kymowidth=8;
                   expinfo.channelshift=0.9677; 
         end
-    case 2    %'2019_07_26 condensin_supercoil_no_ATP\'
-        expinfo.tres_pk_DNA=0.15;      %used for final peak selection; fraction of first 90%
-        expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
-        switch roi          
-           case 1 
-                      expinfo.endpoints_xy=[27 2 ; 13 86]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=11; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI....  
-            case 2
-                      expinfo.endpoints_xy=[17 13 ; 25 116]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=8; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI....  
-            case 3
-                      expinfo.endpoints_xy=[16 11 ; 23 118]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=11; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI....  
-            case 4
-                      expinfo.endpoints_xy=[15 8 ; 26 107]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=11; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI....  
-            case 5
-                      expinfo.endpoints_xy=[9 8 ; 22 101]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=11; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-
-        end 
-    case 3  %2019_09_02 NumberOfCondensinPerDNA
-        expinfo.tres_pk_DNA=0.15;      %used for final peak selection; fraction of first 90%
-        expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
-        switch roi
-            case 1
-                      expinfo.endpoints_xy=[11 26 ; 18 138]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=20; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-           case 2
-                      expinfo.endpoints_xy=[23 6 ; 12 101]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=18; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-            case 3
-                      expinfo.endpoints_xy=[25 5 ; 13 100]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=16; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-            case 4
-                      expinfo.endpoints_xy=[28 5 ; 18 69]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=26; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-            case 5
-                      expinfo.endpoints_xy=[20 2 ; 12 111]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=24; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-            case 6
-                      expinfo.endpoints_xy=[22 5 ; 11 81]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=24; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-            case 7
-                      expinfo.endpoints_xy=[10 5 ; 12 91]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=20; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-            case 8
-                      expinfo.endpoints_xy=[18 1 ; 10 106]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=22; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-            case 9
-                      expinfo.endpoints_xy=[19 9 ; 10 110]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=22; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-            case 10
-                      expinfo.endpoints_xy=[24 2 ; 8 107]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=16; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI.... 
-        end
-        
-end
             
