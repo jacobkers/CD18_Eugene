@@ -1,6 +1,5 @@
 function [flag,cleanprf]=prf_outlier_flag(prf,tolerance,sigchange,how,sho);
-% 'Use this section for a Quicksheet'
- %------------------------------------------------------------------
+ %JWJK_C:-------------------------------------------------------------------  
     %this function is meant to find a representative value for a standard
     %deviation in a heavily skewed distribution (typically, flat prf with
     % %peaks). It calculates the standard deviation and average the prf;
@@ -8,7 +7,20 @@ function [flag,cleanprf]=prf_outlier_flag(prf,tolerance,sigchange,how,sho);
     % of average and SD; this is repeated until sigma does not change anymore too much
     % This is repeated until the new sigma does not change much anymore
     %output: positions of outliers. Jacob Kers 2013 and before
- % 'End of Quicksheet section'
+
+    %input (suggested):
+        % data: single data array
+        % tolerance: beyond how many sigmas is considered outlier (3)
+        % sigchange: stop iteration if relative decrease of sigma is less (0.7)
+        % how: consider positive outliers, or all ('all' /'positive'
+        % sho: (for demo only) show intermediate graphs (0)
+
+    %output: 
+        %flags: positions of outliers
+        %cleandata: data w/o outliers
+      %Reference: Cees Dekker Lab, 
+      %code designed & written Jacob Kerssemakers 2016 
+    %:JWJK_C-------------------------------------------
 
 binz=50;
 
