@@ -1,6 +1,12 @@
 function [curvestart,curvestop,curveok]=prf_find_profile_edges(prf, type_of_profile);
-    %function uses 'shaved off' profile to find start and stop
-    
+%JWJK_C*:-------------------------------------------------------------------
+%Title: find profile edges
+%Summary: %This function uses a 'shaved off' profile to find start and
+%stop; includes demo-run.
+%Approach: 
+%References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+%:JWJK_C*-------------------------------------------------------------------
+
     %% Demo mode
     if nargin<2
         prf=prf_make_demo_curves('plectoneme');      

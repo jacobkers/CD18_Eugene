@@ -47,17 +47,17 @@ for pr=1:5 %length(projectdirlist)
     do_singledir=0;  %Use this if you want to search one directory, no subdirectories
 
     dt = datestr(now, 'mmmm_dd_yyyy_HH_MM');
-    nm=strcat(singledir,'a0_code_info_',projectname); 
+    nm=strcat(singledir,'a0_code_info_',projectname,'Version',dt); 
     diary(strcat(nm,'.txt'));    
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     disp(['Version : ',dt]);
     disp('__________________________________________________________');
     disp('Order of listing:');
-    disp('Main programs: project-specific shell programs');  %A
-    disp('Secondary programs are project-specific sub-programs'); %B 
-    disp('"Tools are small sub-functions'); %C
-    disp('"Favorite Tools" are handy sub-functions of common interest'); %C*
+    disp('main programs: project-specific shell programs');  %A
+    disp('secondary programs are project-specific sub-programs'); %B 
+    disp('tools are small sub-functions'); %C
+    %disp('"favorite tools" are handy sub-functions of common interest'); %C*
     disp('_________________________________________________________');
     disp('       ');
     Headers=[{'A'} , {'B'} {'C'} {'C*'}];  
@@ -82,10 +82,10 @@ for pr=1:5 %length(projectdirlist)
         for hh=1:NHeaders
             HeaderLabel=char(Headers(hh));
             switch HeaderLabel
-                case 'A', titleheader='Code category: main analysis';    
-                case 'B', titleheader='Code category: sub analysis';    
-                case 'C', titleheader='Code category: tools' ; 
-                case 'C*', titleheader='Code category: favorite tools' ;   
+                case 'A', titleheader='main analysis';    
+                case 'B', titleheader='sub analysis';    
+                case 'C', titleheader='tools' ; 
+                case 'C*', titleheader='favorite tools' ;   
             end    
             disp(' ');
             disp(titleheader);
