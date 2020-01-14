@@ -5,8 +5,8 @@ function [curvestart,curvestop,curveok]=prf_get_edgeslength(prf_res, type_of_pro
         
     [lo_L,ixL]=min(prf_res(1:ceil(Lp/2)));
     [lo_R,ixR]=min(prf_res(ceil(Lp/2):end)); ixR=ixR+ceil(Lp/2)-1;
-    slopefit=polyval(polyfit([ixL ixR],[lo_L lo_R],1),axz);
-    
+    %slopefit=polyval(polyfit(linspace(ixL, ixR,50),linspace(lo_L, lo_R,50),1),axz);
+    slopefit=(lo_R-lo_L)/(ixR-ixL).*(axz-ixL)+lo_L;
     prf_res_ft=prf_res-slopefit;
     
     switch type_of_profile
