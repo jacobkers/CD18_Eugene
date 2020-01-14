@@ -1,4 +1,4 @@
-function [info_Cnd_allROIs,info_DNA_allROIs]=spots00_harvest_all_rois(expi,init,AllExp,outpath);
+function [info_Cnd_allROIs,info_DNA_allROIs]=spots00_harvest_all_ROIs(expi,init,AllExp,outpath);
 %JWJK_B:----[add ABCorC*----------------------------------------------------
 %Title: Gather all info of different tethers
 %Summary: Collect all spot position ans content data from all chosen rois, 
@@ -29,13 +29,13 @@ info_Cnd_allROIs=struct(...
         );
     
 LE=length(AllExp);  %for all experiments
-SaveName=char(strcat(outpath, 'AllROI_allresults.mat'));
+SaveName=char(strcat(outpath, 'EKMcp_A030_AllROI_allresults.mat'));
  close all;
 for roi=1:LE  
     Exp=strcat(init.roidirname,num2str(AllExp(roi)));
     expinfo=A002_Condensin_with_plectonemes_expinfo(expi,AllExp(roi));
     corr=expinfo.channelshift;    
-    LoadName=char(strcat(outpath, Exp));             
+    LoadName=char(strcat(outpath, 'EKMcp_A020_',Exp));             
     disp(strcat('Harvesting data: Exps to work through:',num2str(LE-roi)));
     load(strcat(LoadName, '_allresults.mat')); 
     

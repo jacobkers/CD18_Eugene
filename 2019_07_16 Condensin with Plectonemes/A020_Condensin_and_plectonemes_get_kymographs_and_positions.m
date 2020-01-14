@@ -38,7 +38,7 @@ LE=length(AllExp);  %for all experiments
 for roi=1:LE  
 Exp=strcat(init.roidirname,num2str(AllExp(roi)));
     expinfo=A002_Condensin_with_plectonemes_expinfo(expi,AllExp(roi));
-    SaveName=char(strcat(outpath, Exp)); 
+    SaveName=char(strcat(outpath,'EKMcp_A020_',Exp)); 
     
 %% Kymographs
 if actions.buildkymographs     
@@ -51,6 +51,11 @@ if actions.buildkymographs
         kymo_DNA=kym_build_kymo_from_movie(dna_pth,expinfo);       
         kymo_Cnd=kym_build_kymo_from_movie(condensin_pth,expinfo);             
         save(strcat(SaveName, '_allresults.mat'), 'kymo_DNA','kymo_Cnd');
+        
+        if 1 %optional back-saving a kymograph  for later use (for example, using 'boxtrack')
+          dlmwrite([generaldatapth, Exp,'\kymograph\EKMcp_A020_Kymograph_MukBEF.txt'],kymo_Cnd);
+        end
+        
         if 1
         figure(64); 
             subplot(1,2,1); pcolor(kymo_DNA); shading flat; colormap hot; 

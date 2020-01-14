@@ -13,10 +13,10 @@ function init=A001_condensin_with_plectonemes_init(expi);
 %:JWJK_A-----[add ABCorC*---------------------------------------------------
 
 %local paths
-JKpth='C:\Users\jkerssemakers\'
+JKpth='D:\jkerssemakers\'
 init.datapathin=[JKpth 'CD_Data_in\2018_Eugene\'];                      %loading
 init.datapathout=[JKpth 'Dropbox\CD_Data_out\2018_Eugene\'];            %saving
-addpath(genpath([JKpth 'Dropbox\CD_recent\BN_CD18_Eugene\Matlab\Matlab_tools_CD18EK'])); %tools:
+addpath(genpath([JKpth 'Dropbox\CD_recent\BN_CD18_Eugene\Matlab\Matlab_tools_CD18EK\'])); %tools:
 
 %test mode paths (should work from anywhere)
 init.datapathin=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_in\Eugene\2019_CondensinWithPlectonemes\'];                      %loading
@@ -32,15 +32,15 @@ switch expi
         init.roidirname='ROI';
     case 2  %without ATP
         init.expname='2019_07_26 condensin_supercoil_no_ATP\';  %directory name       
-        init.AllExp=[1 2];        %numbers of various
+        init.AllExp=[1 2];        %numbers of various rois
         init.roidirname='ROI';
     case 3  %counting condensins
         init.expname='2019_09_02 NumberOfCondensinPerDNA\';  %directory name                
-        init.AllExp=[1 2];        %numbers of various
+        init.AllExp=[1 2];        %numbers of various rois
         init.roidirname='M';
     case 4  %MukBEF
         init.expname='2020_01_13 MukBEF_msd_wATP\';  %directory name                   
-        init.AllExp=[1 2];        %numbers of various
+        init.AllExp=[1:11];        %numbers of various rois
         init.roidirname='ROI';
 end
 

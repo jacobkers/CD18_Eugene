@@ -14,4 +14,4 @@ init=A001_condensin_with_plectonemes_init(expi);
 %init.AllExp=[1];        %short run 
 
 if 1, A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi);end
-if 1, A030_Condensin_and_plectonemes_process_positions(init,expi) ;end
+if 1, A030_Condensin_and_plectonemes_process_positions(init,expi) ; end

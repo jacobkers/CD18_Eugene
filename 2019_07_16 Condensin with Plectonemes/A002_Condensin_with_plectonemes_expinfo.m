@@ -23,24 +23,30 @@ function expinfo=get_roiproperties_of_2020_01_13_MukBEF_msd_wATP(roi);
         expinfo.labelname='MukBEF';
         expinfo.tres_pk_DNA=0.15;      %used for final peak selection; fraction of first 90%
         expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
-        switch roi          
-           case 1 
-                      expinfo.endpoints_xy=[15 6 ; 14 86]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=25; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI....  
-            case 2
-                      expinfo.endpoints_xy=[10 14 ; 40 77]; %in image x1 y1 x2 y2   
-                      expinfo.driftxy=[0 0]; %deltax, deltay %between startframe and endframe
-                      expinfo.kymowidth=35; %adjust with neighbours nearby
-                      expinfo.channelshift=0; %manually per ROI....          
-        end 
+        roiprops=[...  %no  x1  y1  x2   y2     wd  drx dry chanshift
+                        1   15  6   14   86     25   0   0  0;
+                        2   10  14   40   77    77   0   0  0;
+                        3   27  11   26   64    20   0   0  0;
+                        4   13  12   12   87    15   0   0  0;
+                        5   16  12   18   104   20   0   0  0;
+                        6   11  5    18   112   20   0   0  0;
+                        7   13  10   31   97    20   0   0  0;
+                        8   11  10   15   77    20   0   0  0;
+                        9   12  6    12   63    20   0   0  0;
+                        10  15  7    10   72    18   0   0  0;
+                        11  15  11   16   140   20   0   0  0;
+                        ];
+         expinfo.endpoints_xy=[roiprops(roi,2:3) ; roiprops(roi,4:5)]; %in image x1 y1 x2 y2   
+         expinfo.driftxy=roiprops(roi,7:8); %deltax, deltay %between startframe and endframe
+         expinfo.kymowidth=roiprops(roi,6); %adjust with neighbours nearby
+         expinfo.channelshift=roiprops(roi,9);; %manually per ROI....  
 
 
 function expinfo=get_roiproperties_of_2019_09_02_NumberOfCondensinPerDNA(roi);
         expinfo.labelname='Condensin';
         expinfo.tres_pk_DNA=0.15;      %used for final peak selection; fraction of first 90%
         expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
+        
         switch roi
             case 1
                       expinfo.endpoints_xy=[11 26 ; 18 138]; %in image x1 y1 x2 y2   
