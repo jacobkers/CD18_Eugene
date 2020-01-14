@@ -1,4 +1,4 @@
-function A030_BoxTracker(expname)
+function A030_BoxTracker(initval, expname)
 %JWJK_A:----[add ABCorC*----------------------------------------------------
 %Title: tracking a user-selected peak through a kymograph
 %Summary: part of a shell program; it uses a list of user-clicked start-and
@@ -15,14 +15,6 @@ function A030_BoxTracker(expname)
 close all;
 addpath(genpath(pwd));
 
-initval=A001_Initialize_Kymo(expname);
-
-
-%% if you want to override, redo single ROIs etc.
-%initval.roilist=[9];
-
-
-
 %% get the ROIs to analyze
 Lroi=length(initval.roilist);
 %%  work trhough all ROIs
@@ -34,14 +26,17 @@ for roii=1:Lroi
     savit=1;
     roino=initval.roilist(roii);
     Exp=strcat('ROI',num2str(roino));
-    LoadName=char(strcat(initval.expi_outpath, Exp,'_clickinfo'));
+    LoadName=char(strcat(initval.expi_outpath, 'EKMbt_A028_',Exp,'_clickinfo'));
     load(LoadName);
+    SaveName=char(strcat(initval.expi_outpath, 'EKMbt_A028_',Exp));
     
-
-    SaveName=char(strcat(initval.expi_outpath, Exp));
-    datainpath=strcat(initval.expi_inpath,'M', num2str(roino),'\kymo_ImageJ\');       
+    %source kymograph
+    datainpath=strcat(initval.expi_inpath,initval.roilabel, num2str(roistartstop.roino),initval.kymodir);       
     source=[datainpath, initval.kymofile];
     trackmap=dlmread(source);
+   
+    
+    
     %% get general properties, such as tether edges
     [ff,cc]=size(trackmap);   
     [tetherstart,tetherstop]=kym_get_tetheredges(trackmap);
@@ -134,7 +129,7 @@ function Plot_menu_II(trackmap, looptraces,savit, SaveName,Nloops);
      title('traces')
         ylabel('frameno, a.u.');
         xlabel('position, a.u.');
-    for jj=1:2
+    for jj=1:Nloops
         subplot(2,2,2*jj);
         plot(looptraces(jj).frame,looptraces(jj).Regloop.I_hat,'k-','LineWidth',1); hold on;
         plot(looptraces(jj).frame,looptraces(jj).Regloop.I_left_neighbour,'b-'); hold on;
@@ -170,7 +165,8 @@ function Plot_menu_III(trackmap, looptraces,savit, SaveName,Nloops);
      title('traces')
         ylabel('frameno, a.u.');
         xlabel('position, a.u.');
-    for jj=1:2
+        
+    for jj=1:Nloops
         subplot(2,2,2*jj);
         plot(looptraces(jj).frame,looptraces(jj).Regloop.I_hat,'k-','LineWidth',1); hold on;
         plot(looptraces(jj).frame,looptraces(jj).Regloop.I_left_full,'b-'); hold on;

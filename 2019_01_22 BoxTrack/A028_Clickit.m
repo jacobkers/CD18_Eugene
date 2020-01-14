@@ -1,5 +1,4 @@
-function A028_Clickit(expname)
-%collect positions
+function A028_Clickit(initval,expname)
 %JWJK_A:----[add ABCorC*----------------------------------------------------
 %Title: Start-stop-width clicker
 %Summary: user can click start, stop and width ofmultiple loops in a
@@ -9,13 +8,7 @@ function A028_Clickit(expname)
 %Approach: follow click instructions on title pop-up kymograph
 %References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
 %:JWJK_A-----[add ABCorC*---------------------------------------------------
-
-
-initval=A001_Initialize_Kymo(expname);
-initval.roilist=[3:53]; 
-
-%% if you want to override, redo single ROIs etc.
-%initval.roilist=[38]; 
+ 
 
 %% get the ROIs to analyze
 L_roi=length(initval.roilist);
@@ -24,16 +17,20 @@ for ii=1:L_roi
     roistartstop.roino=initval.roilist(ii);  %3 26 %38
     close all;
     Exp=strcat('ROI',num2str(roistartstop.roino));
-    SaveName=char(strcat(initval.expi_outpath, Exp,'_clickinfo'));
-    datainpath=strcat(initval.expi_inpath,'M', num2str(roistartstop.roino),'\kymo_ImageJ\');       
+    SaveName=char(strcat(initval.expi_outpath, 'EKMbt_A028_',Exp,'_clickinfo'));
+    
+    %source kymograph
+    datainpath=strcat(initval.expi_inpath,initval.roilabel, num2str(roistartstop.roino),initval.kymodir);       
     source=[ datainpath, initval.kymofile];
     trackmap=dlmread(source);
+    
+    
     [ff,cc]=size(trackmap);
     pcolor(trackmap); colormap(hot); shading flat; hold on;
 
     %% click the start and stop positions of the loop
     stopit=0; cnt=0;
-    while ~stopit  %cnt<2 %for N=2
+    while cnt<2  %~stopit  %cnt<2 %for N=2
         cnt=cnt+1;
         title([Exp, ':click 3x: 1) pre, 2) start 3) stop  rightclick 3x to end']);
         colormap(hot);
