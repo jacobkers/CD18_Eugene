@@ -1,4 +1,4 @@
-function A030_Condensin_and_plectonemes_process_positions(init,expi)
+function A030_Condensin_and_plectonemes_process_positions(init,expi,usr)
 %JWJK_A:-------------------------------------------------------------------
 %Summary: %This function analyzes spots positions associated with 
 %DNA plectonemes and condensin
@@ -18,7 +18,7 @@ close all;
     outpath=strcat(datapathout, 'matlabresults\',expname,'\');
 
 %% 3 collect (and save) all info from the selected rois
-    [info_Cnd_allROIs,info_DNA_allROIs]=spots00_harvest_all_ROIs(expi,init,AllExp,outpath);
+    [info_Cnd_allROIs,info_DNA_allROIs]=spots00_harvest_all_ROIs(expi,init,AllExp,outpath,usr);
     subplot(1,2,1);
     plot(info_DNA_allROIs.pos_X_subpix, info_DNA_allROIs.pos_frameno, 'bo','Markersize',2); hold on;
             plot(info_Cnd_allROIs.pos_X_subpix, info_Cnd_allROIs.pos_frameno, 'ro','Markersize',1);

@@ -1,4 +1,4 @@
-function A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi);
+function A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi,usr);
 %JWJK_A:-------------------------------------------------------------------
 %Summary: %This function builds kymographs from images 
 %and analyzes them for peaks associated with DNA plectonemes and condensin
@@ -19,7 +19,7 @@ close all;
 actions.buildkymographs=1;  %make raw kymographs
 actions.peakdetection=1;    %detect peaks; convert to genomic percentage and condensin counts
 actions.plot=1;   %plectoneme/condensin relations etc
-    
+actions.backsaving=0;    %optional back-saving a kymograph  for later use; uses specific names! check the lines
 
 %% 1) Set common paths; use standardized naming
 datapathin=init.datapathin;
@@ -37,9 +37,12 @@ psf_est=init.psf_est;
 LE=length(AllExp);  %for all experiments
 for roi=1:LE  
 Exp=strcat(init.roidirname,num2str(AllExp(roi)));
-    expinfo=A002_Condensin_with_plectonemes_expinfo(expi,AllExp(roi));
+switch usr
+    case 'Jacob',  expinfo=A002_JK_Condensin_with_plectonemes_expinfo(expi,AllExp(roi));
+    case 'Eugene', expinfo=A002_EK_Condensin_with_plectonemes_expinfo(expi,AllExp(roi));
+end
     SaveName=char(strcat(outpath,'EKMcp_A020_',Exp)); 
-    
+        
 %% Kymographs
 if actions.buildkymographs     
     if mod(roi,1)==0, disp(strcat('Building kymograph:',expname,':Exps to work through:',num2str(LE-roi+1)));end     
@@ -52,7 +55,7 @@ if actions.buildkymographs
         kymo_Cnd=kym_build_kymo_from_movie(condensin_pth,expinfo);             
         save(strcat(SaveName, '_allresults.mat'), 'kymo_DNA','kymo_Cnd');
         
-        if 1 %optional back-saving a kymograph  for later use (for example, using 'boxtrack')
+        if actions.backsaving %optional back-saving a kymograph  for later use (for example, using 'boxtrack')
           dlmwrite([generaldatapth, Exp,'\kymograph\EKMcp_A020_Kymograph_MukBEF.txt'],kymo_Cnd);
         end
         
