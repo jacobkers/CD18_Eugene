@@ -12,12 +12,12 @@ function info_1=spots0_cleanup_spots(info_1);
                     % content_peakvals
                     % content_perspot_est
                     % content_perspot_meas
-         info_1.label_OKspot=0*info_1.pos_frameno;         
+         info_1.label.OKspot=0*info_1.pos_frameno;         
          Ic=info_1.content_perspot_meas;
   
         %first, get some measures: this one gets the presumed
         %single-condensin counts
-        [flag,cleandata]=prf_outlier_flag(Ic,100,0.7,'positive',1); 
+        [flag,cleandata]=prf_outlier_flag(Ic,100,0.7,'positive',0); 
         sel=find(flag==1);
-        info_1.label_OKspot(sel)=1;
+        info_1.label.OKspot(sel)=1;
         

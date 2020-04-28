@@ -1,4 +1,4 @@
-function [info_Cnd_allROIs,info_DNA_allROIs]=spots00_harvest_all_ROIs(expi,init,AllExp,outpath,usr);
+function [info_Cnd_allROIs,info_DNA_allROIs]=spots00_harvest_all_ROIs(expi,init,AllExp,usr);
 %JWJK_B:----[add ABCorC*----------------------------------------------------
 %Title: Gather all info of different tethers
 %Summary: Collect all spot position ans content data from all chosen rois, 
@@ -15,7 +15,8 @@ info_Cnd_allROIs=struct(...
         'content_perspot_est',[],...
         'content_perspot_meas',[],...
         'free_spots_numbers',[],...
-        'free_tether_lengths',[]...
+        'free_tether_lengths',[],...
+        'farfrom_dna_edges',[]...
         );
     
  info_DNA_allROIs=struct(...
@@ -29,8 +30,9 @@ info_Cnd_allROIs=struct(...
         );
     
 LE=length(AllExp);  %for all experiments
-SaveName=char(strcat(outpath, 'EKMcp_A030_AllROI_allresults.mat'));
- close all;
+inpath=strcat(init.datapathout, 'matlabresults\',init.expname,'\');
+
+close all;
 for roi=1:LE  
     Exp=strcat(init.roidirname,num2str(AllExp(roi)));
     switch usr
@@ -39,7 +41,7 @@ for roi=1:LE
     end    
     
     corr=expinfo.channelshift;    
-    LoadName=char(strcat(outpath, 'EKMcp_A020_',Exp));             
+    LoadName=char(strcat(inpath, 'EKMcp_A020_',Exp));             
     disp(strcat('Harvesting data: Exps to work through:',num2str(LE-roi)));
     load(strcat(LoadName, '_allresults.mat')); 
     
@@ -65,6 +67,7 @@ for roi=1:LE
     info_Cnd_allROIs.content_perspot_meas=[info_Cnd_allROIs.content_perspot_meas info_Cnd.content_perspot_meas];
     info_Cnd_allROIs.free_spots_numbers=[info_Cnd_allROIs.free_spots_numbers  info_Cnd.general_free_number];
     info_Cnd_allROIs.free_tether_lengths=[info_Cnd_allROIs.free_tether_lengths info_Cnd.general_total_freetetherlength];
+    info_Cnd_allROIs.farfrom_dna_edges=[info_Cnd_allROIs.farfrom_dna_edges info_Cnd.classify.awayfromDNAedges];
 end
 info_Cnd_allROIs.free_spots_densities=info_Cnd_allROIs.free_spots_numbers./...
                                       info_Cnd_allROIs.free_tether_lengths;
@@ -72,4 +75,4 @@ info_Cnd_allROIs.free_spots_densities_av=nanmean(info_Cnd_allROIs.free_spots_den
 info_Cnd_allROIs.free_spots_densities_st=nanstd(info_Cnd_allROIs.free_spots_densities);
 
 dum=1;
-save(SaveName,'info_DNA_allROIs','info_Cnd_allROIs'); 
+
