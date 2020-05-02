@@ -1,4 +1,4 @@
-function A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi,usr);
+function A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi,usr,actions);
 %JWJK_A:-------------------------------------------------------------------
 %Summary: %This function builds kymographs from images 
 %and analyzes them for peaks associated with DNA plectonemes and condensin
@@ -16,8 +16,8 @@ close all;
 
 %% 3 choose the run actions; 
 %each step stores new data&reloads from former step 
-actions.buildkymographs=1;  %make raw kymographs
-actions.peakdetection=1;    %detect peaks; convert to genomic percentage and condensin counts
+
+
 actions.plot=1;   %plectoneme/condensin relations etc
 actions.backsaving=0;    %optional back-saving a kymograph  for later use; uses specific names! check the lines
 
@@ -105,6 +105,8 @@ if actions.peakdetection
                             'kymo_DNA_peaks', 'kymo_Cnd_peaks', '-append');    
 end
 
+
+dum=1;
 
 %% plotting
 if actions.plot>0       

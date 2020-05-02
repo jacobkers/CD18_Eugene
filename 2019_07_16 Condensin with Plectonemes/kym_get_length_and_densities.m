@@ -7,23 +7,37 @@ function [info_DNA,info_Cnd]=kym_get_length_and_densities(info_DNA,info_Cnd,kymo
 %References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
 %:JWJK_C-------------------------------------------------------------------
    
+%% get averaged DNA edges
    [rr,cc]=size(kymo_DNA);
    prf_av=nanmedian(kymo_DNA);
    [curvestart,curvestop,curveok]=prf_find_profile_edges(prf_av, 'tether');
-   if curveok
+   info_DNA.general.curveok=curveok;
+   if curveok    
+       info_DNA.general.curvestart=curvestart;
+       info_DNA.general.curvestop=curvestop;
        info_DNA.general_tetherlength=curvestop-curvestart;
    else
        info_DNA.general_tetherlength=[];
+       info_DNA.general.curvestart=[];
+       info_DNA.general.curvestop=[];
    end
-   info_DNA.general_freetetherlength=info_DNA.general_tetherlength-6;
- 
+   
+   %% add some classification for the condensin
+   isawayfromDNAedges=(info_Cnd.pos_X_pix>curvestart+3)&...
+                      (info_Cnd.pos_X_pix<curvestop-3);
+                  
+   info_Cnd.classify.awayfromDNAedges=isawayfromDNAedges;
+   
+   
+   
+   %% get general numbers  for this kymograph
+    info_DNA.general_freetetherlength=info_DNA.general_tetherlength-6;
     info_DNA.general_total_tetherlength=info_DNA.general_tetherlength*rr;
-    info_DNA.general_total_freetetherlength=info_DNA.general_freetetherlength*rr;
-    
+    info_DNA.general_total_freetetherlength=info_DNA.general_freetetherlength*rr;   
     info_Cnd.general_total_freetetherlength=info_DNA.general_total_freetetherlength;
-    
-    
     info_Cnd.general_total_number=length(info_Cnd.pos_X_pix);
+    
+    
     info_Cnd.general_free_number=length(find(...
              (info_Cnd.pos_X_pix>curvestart+3)&...
              (info_Cnd.pos_X_pix<curvestop-3)));
