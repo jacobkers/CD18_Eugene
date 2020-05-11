@@ -1,4 +1,4 @@
-function [info_Cnd_allROIs,info_DNA_allROIs]=spots00_harvest_all_ROIs(expi,init,AllExp,usr);
+function [info_Cnd_allROIs,info_DNA_allROIs,info_Cnd_per_ROI,info_DNA_per_ROI]=spots00_harvest_all_ROIs(expi,init,AllExp,usr);
 %JWJK_B:----[add ABCorC*----------------------------------------------------
 %Title: Gather all info of different tethers
 %Summary: Collect all spot position ans content data from all chosen rois, 
@@ -45,8 +45,24 @@ for roi=1:LE
     disp(strcat('Harvesting data: Exps to work through:',num2str(LE-roi)));
     load(strcat(LoadName, '_allresults.mat')); 
     
+
+    
+
+    
+    
     Ld=length(info_DNA.pos_frameno);
-    info_DNA.pos_roino=1:Ld;
+    [kymo_duration,kymo_width]=size(kymo_DNA);
+    info_DNA.pos_roino=0*(1:Ld)+roi;
+    
+    info_DNA_per_ROI.kymo_duration(roi)=kymo_duration;
+    info_DNA_per_ROI.kymo_width(roi)=kymo_width;
+    info_DNA_per_ROI.channelshift(roi)=expinfo.channelshift;
+    info_DNA_per_ROI.SaveName{roi}=char(strcat('Roi_',Exp)); 
+   
+    info_Cnd_per_ROI.kymo_duration(roi)=kymo_duration;
+    info_Cnd_per_ROI.kymo_width(roi)=kymo_width;  
+    info_Cnd_per_ROI.channelshift(roi)=expinfo.channelshift;
+    info_Cnd_per_ROI.SaveName{roi}=char(strcat('Roi_',Exp)); 
     
     info_DNA_allROIs.pos_roino=[info_DNA_allROIs.pos_roino info_DNA.pos_roino];
     info_DNA_allROIs.pos_frameno=[info_DNA_allROIs.pos_frameno info_DNA.pos_frameno];

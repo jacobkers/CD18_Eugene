@@ -12,17 +12,18 @@ switch 2
     case 2, usr='Jacob'; 
         %expi=1; %'2019_07_15 condensin_supercoil\'
         %expi=2; %'2019_07_26 condensin_supercoil_no_ATP\'
-        expi=3; %'2019_09_02_NumberOfCondensinPerDNA\'        
+        expi=3; %'2019_09_02_NumberOfCondensinPerDNA\'  TEST   
+        %expi=5; %'2020_05_05 data_sc_cnd\'  
         init=A001_JK_condensin_with_plectonemes_init(expi);
 end
 
 %init.AllExp=[1];        %short run 
 if 0 
     actions.buildkymographs=0;  %make raw kymographs
-    actions.peakdetection=1;    %detect peaks; convert to genomic percentage and condensin counts
+    actions.peakdetection=0;    %detect peaks; convert to genomic percentage and condensin counts
     A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi,usr,actions);
 end
-if 0, A030_Condensin_and_plectonemes_process_positions(init,expi,usr) ; end
+if 1, A030_Condensin_and_plectonemes_process_positions(init,expi,usr) ; end
 if 1, A040_Condensin_and_plectonemes_follow_up_process(init,expi,usr) ; end
 dum=1;
 clear all;

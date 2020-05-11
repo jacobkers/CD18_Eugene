@@ -36,13 +36,17 @@ switch expi
         init.expname='2019_07_26 condensin_supercoil_no_ATP\';  %directory name       
         init.AllExp=[1 2];        %numbers of various rois
         init.roidirname='ROI';
-    case 3  %counting condensins
+    case 3  %counting condensins; TEST
         init.expname='2019_09_02 NumberOfCondensinPerDNA\';  %directory name                
         init.AllExp=[1 2];        %numbers of various rois
         init.roidirname='M';
     case 4  %MukBEF
         init.expname='2020_01_13 MukBEF_msd_wATP\';  %directory name                   
         init.AllExp=[1:11];        %numbers of various rois
+        init.roidirname='ROI';
+    case 5  %recent condnesin/plec data
+        init.expname='2020_05_05 data_sc_cnd\';  %directory name                   
+        init.AllExp=[1 5 7 16];        %numbers of various rois
         init.roidirname='ROI';
 end
 

@@ -18,8 +18,8 @@ close all;
     SaveName='EKMcp_A030_AllROI_allresults.mat';
 
 %% 3 collect (and save) all info from the selected rois
-    [info_Cnd_allROIs,info_DNA_allROIs]=spots00_harvest_all_ROIs(expi,init,AllExp,usr);
-    save([outpath,SaveName],'info_DNA_allROIs','info_Cnd_allROIs'); 
+    [info_Cnd_allROIs,info_DNA_allROIs,info_Cnd_per_ROI,info_DNA_per_ROI]=spots00_harvest_all_ROIs(expi,init,AllExp,usr);
+    save([outpath,SaveName],'info_DNA_allROIs','info_Cnd_allROIs','info_Cnd_per_ROI','info_DNA_per_ROI'); 
     
     
     
