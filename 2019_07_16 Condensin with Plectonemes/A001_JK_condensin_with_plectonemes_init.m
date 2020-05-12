@@ -12,22 +12,29 @@ function init=A001_JK_condensin_with_plectonemes_init(expi);
 %References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
 %:JWJK_A-----[add ABCorC*---------------------------------------------------
 
-%local paths
-init.datapathin=swap_path('CD_Data_in\2018_Eugene\');                      %loading
-init.datapathout=swap_path('Dropbox\CD_Data_out\2018_Eugene\');            %saving
+switch 2
+    case 1
+    %local paths
+    init.datapathin=swap_path('CD_Data_in\2018_Eugene\');                      %loading
+    init.datapathout=swap_path('Dropbox\CD_Data_out\2018_Eugene\');            %saving
+    case 2
+    %test mode paths (should work from anywhere)
+    init.datapathin=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_in\Eugene\2019_CondensinWithPlectonemes\'];                      %loading
+    init.datapathout=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_out\Eugene\'];            %saving
+end
 addpath(genpath(swap_path('Dropbox\CD_recent\BN_CD18_Eugene\Matlab\Matlab_tools_CD18EK\'))); %tools:
 
-% %test mode paths (should work from anywhere)
-% init.datapathin=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_in\Eugene\2019_CondensinWithPlectonemes\'];                      %loading
-% init.datapathout=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_out\Eugene\'];            %saving
+ 
 
-init.datapathin=swap_path('CD_Data_in\2018_Eugene\'); %loading
-init.datapathout=swap_path('Dropbox\CD_Data_out\2018_Eugene\');            %saving
 
 
 %% Add the experiment subdirectory names  to the list below, following the same naming formats
 %as the other experiments
 switch expi
+     case 0  %counting condensins; TEST
+        init.expname='2019_09_02 NumberOfCondensinPerDNA\';  %directory name                
+        init.AllExp=[1 2];        %numbers of various rois
+        init.roidirname='M';
     case 1  %'2019_07_15 condensin_supercoil\' 
         init.expname='2019_07_15 condensin_supercoil\';  %directory name        
         init.AllExp=[1 2];        %numbers of various rois  
@@ -38,7 +45,7 @@ switch expi
         init.roidirname='ROI';
     case 3  %counting condensins; TEST
         init.expname='2019_09_02 NumberOfCondensinPerDNA\';  %directory name                
-        init.AllExp=[1 2];        %numbers of various rois
+        init.AllExp=[1 2 3 4 5 6 7 8 9 10];        %numbers of various rois
         init.roidirname='M';
     case 4  %MukBEF
         init.expname='2020_01_13 MukBEF_msd_wATP\';  %directory name                   
@@ -47,6 +54,10 @@ switch expi
     case 5  %recent condnesin/plec data
         init.expname='2020_05_05 data_sc_cnd\';  %directory name                   
         init.AllExp=[1 5 7 16];        %numbers of various rois
+        init.roidirname='ROI';
+   case 11  %Atto_condensin_42kb_nicking
+        init.expname='Atto_condensin_42kb_nicking\';  %directory name                   
+        init.AllExp=[1 2 3 4];        %numbers of various rois
         init.roidirname='ROI';
 end
 

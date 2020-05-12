@@ -26,27 +26,24 @@ function info_1=classify_labels(info_1,info_2,psf_est,corr,spot_type);
         
         %% general: find label1-label2 association per time point
         info_1.label.label1_label2associated=0*info_1.pos_frameno;
-        FF=max(info_2.pos_frameno);
-        for ii=1:FF
-            fi_2=find(info_2.pos_frameno==ii);
-            fi_1=find(info_1.pos_frameno==ii);           
-            if ~isempty(fi_2)&~isempty(fi_1);
-             xx1=info_1.pos_X_subpix(fi_1);     %positions label1
-             xx2=info_2.pos_X_subpix(fi_2);     %positions label2
-             Lc=length(xx1);
-                for jj=1:Lc
-                    oridx=fi_1(jj); %original indices of label1;
-                    x1=xx1(jj);
-                    dd=abs(xx2-x1-corr);
-                    [min_d,~]=min(dd);  %nearest of these
-                    info_1.mindist_label1_label2(oridx)=min_d;
-                    if (min_d<psf_est)
-                        info_1.label.label1_label2associated(oridx)=1;
-                        
-                    end
-                end
+        info_1.mindist_label1_label2=NaN*info_1.pos_frameno;
+        Li=length(info_1.pos_frameno);
+        for ii=1:Li
+            roino=info_1.pos_roino(ii);
+            frameno=info_1.pos_frameno(ii);            
+            fi_2=find((info_2.pos_roino==roino)&(info_2.pos_frameno==frameno));          
+            if ~isempty(fi_2)
+                 x1=info_1.pos_X_subpix(ii);     %position label1
+                 xx2=info_2.pos_X_subpix(fi_2);   %positions label2
+                 dd=abs(xx2-x1-corr);
+                 [min_d,~]=min(dd);  %nearest of these
+                 info_1.mindist_label1_label2(ii)=min_d;
+                 if (min_d<2*psf_est)
+                    info_1.label.label1_label2associated(ii)=1;
+                 end
             end
-        end
+       end
+
         if 1
             binax=0:0.5:50;
             disthist=hist(info_1.mindist_label1_label2,binax);

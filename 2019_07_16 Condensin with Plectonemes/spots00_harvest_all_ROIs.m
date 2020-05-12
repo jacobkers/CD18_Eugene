@@ -43,28 +43,24 @@ for roi=1:LE
     corr=expinfo.channelshift;    
     LoadName=char(strcat(inpath, 'EKMcp_A020_',Exp));             
     disp(strcat('Harvesting data: Exps to work through:',num2str(LE-roi)));
-    load(strcat(LoadName, '_allresults.mat')); 
-    
-
-    
-
+    load(strcat(LoadName, '_allresults.mat'));     
     
     
-    Ld=length(info_DNA.pos_frameno);
     [kymo_duration,kymo_width]=size(kymo_DNA);
-    info_DNA.pos_roino=0*(1:Ld)+roi;
-    
+     
     info_DNA_per_ROI.kymo_duration(roi)=kymo_duration;
     info_DNA_per_ROI.kymo_width(roi)=kymo_width;
     info_DNA_per_ROI.channelshift(roi)=expinfo.channelshift;
     info_DNA_per_ROI.SaveName{roi}=char(strcat('Roi_',Exp)); 
-   
+    
     info_Cnd_per_ROI.kymo_duration(roi)=kymo_duration;
     info_Cnd_per_ROI.kymo_width(roi)=kymo_width;  
     info_Cnd_per_ROI.channelshift(roi)=expinfo.channelshift;
     info_Cnd_per_ROI.SaveName{roi}=char(strcat('Roi_',Exp)); 
     
-    info_DNA_allROIs.pos_roino=[info_DNA_allROIs.pos_roino info_DNA.pos_roino];
+    Ld=length(info_DNA.pos_frameno);
+    pos_roino_DNA=0*(1:Ld)+roi; 
+    info_DNA_allROIs.pos_roino=[info_DNA_allROIs.pos_roino pos_roino_DNA];
     info_DNA_allROIs.pos_frameno=[info_DNA_allROIs.pos_frameno info_DNA.pos_frameno];
     info_DNA_allROIs.pos_X_pix=[info_DNA_allROIs.pos_X_pix info_DNA.pos_X_pix];
     info_DNA_allROIs.pos_X_subpix=[info_DNA_allROIs.pos_X_subpix info_DNA.pos_X_subpix];
@@ -73,8 +69,8 @@ for roi=1:LE
     info_DNA_allROIs.content_perspot_meas=[info_DNA_allROIs.content_perspot_meas info_DNA.content_perspot_meas];
     
     Lc=length(info_Cnd.pos_frameno);
-    info_Cnd.pos_roino=1:Lc;
-    info_Cnd_allROIs.pos_roino=[info_Cnd_allROIs.pos_roino info_Cnd.pos_roino];
+    pos_roino_Cnd=0*(1:Lc)+roi;Lc=length(info_Cnd.pos_frameno); 
+    info_Cnd_allROIs.pos_roino=[info_Cnd_allROIs.pos_roino pos_roino_Cnd];
     info_Cnd_allROIs.pos_frameno=[info_Cnd_allROIs.pos_frameno info_Cnd.pos_frameno];
     info_Cnd_allROIs.pos_X_pix=[info_Cnd_allROIs.pos_X_pix info_Cnd.pos_X_pix+corr];
     info_Cnd_allROIs.pos_X_subpix=[info_Cnd_allROIs.pos_X_subpix info_Cnd.pos_X_subpix+corr];

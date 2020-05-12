@@ -21,8 +21,7 @@ close all;
     [info_Cnd_allROIs,info_DNA_allROIs,info_Cnd_per_ROI,info_DNA_per_ROI]=spots00_harvest_all_ROIs(expi,init,AllExp,usr);
     save([outpath,SaveName],'info_DNA_allROIs','info_Cnd_allROIs','info_Cnd_per_ROI','info_DNA_per_ROI'); 
     
-    
-    
+
     subplot(1,2,1);
     plot(info_DNA_allROIs.pos_X_subpix, info_DNA_allROIs.pos_frameno, 'bo','Markersize',2); hold on;
             plot(info_Cnd_allROIs.pos_X_subpix, info_Cnd_allROIs.pos_frameno, 'ro','Markersize',1);

@@ -30,15 +30,13 @@ close all;
     selection=char(selections{sc});
     switch selection
         case 'Cnd_plectoneme_associated'
-            sel=find((info_Cnd_allROIs.label.OKspot==1)&...
-             (info_Cnd_allROIs.label.farfrom_dna_edges==1)&...;
+            sel=find(... 
             (info_Cnd_allROIs.label.label1_label2associated==1));
             info_Cnd_near_plec=shrink_info(info_Cnd_allROIs,sel);
             SaveName=['EKMcp_A040_AllROI_',selection,'.mat'];
             save([inpath,SaveName],'info_Cnd_near_plec'); 
        case 'Cnd_free'
-            sel=find((info_Cnd_allROIs.label.OKspot==1)&...
-             (info_Cnd_allROIs.label.farfrom_dna_edges==1)&...;
+            sel=find(...       
             (info_Cnd_allROIs.label.label1_label2associated==0));
             info_Cnd_free=shrink_info(info_Cnd_allROIs,sel);
             SaveName=['EKMcp_A040_AllROI_',selection,'.mat'];
@@ -67,23 +65,29 @@ close all;
       roiwidth=info_Cnd_per_ROI.kymo_width(ii);
       roiheight=info_Cnd_per_ROI.kymo_duration(ii);
       channelshift=info_Cnd_per_ROI.channelshift(ii);
+      subsel1=find(ii==info_DNA_near_Cnd.pos_roino);
+      subsel2=find(ii==info_DNA_free.pos_roino);
+      subsel3=find(ii==info_Cnd_near_plec.pos_roino);
+      subsel4=find(ii==info_Cnd_free.pos_roino);
       subplot(1,2,1); 
-            plot(info_DNA_near_Cnd.pos_X_subpix+channelshift, info_DNA_near_Cnd.pos_frameno, 'bo','Markersize',4); hold on;
-            plot(info_Cnd_near_plec.pos_X_subpix, info_Cnd_near_plec.pos_frameno, 'ro','Markersize',2);
-            plot(info_DNA_free.pos_X_subpix+channelshift, info_DNA_free.pos_frameno, 'go','Markersize',2); hold on;
-            plot(info_Cnd_free.pos_X_subpix, info_Cnd_free.pos_frameno, 'yo','Markersize',2);
-            legend('plec near Cnd','Condensin near plec','free plec','free Condensin');
+            plot(info_DNA_free.pos_X_subpix(subsel2)+channelshift, info_DNA_free.pos_frameno(subsel2), 'co','Markersize',2); hold on;
+            plot(info_Cnd_free.pos_X_subpix(subsel4), info_Cnd_free.pos_frameno(subsel4), 'go','Markersize',2);
+             plot(info_DNA_near_Cnd.pos_X_subpix(subsel1)+channelshift, info_DNA_near_Cnd.pos_frameno(subsel1), 'bo','Markersize',2); hold on;
+            plot(info_Cnd_near_plec.pos_X_subpix(subsel3), info_Cnd_near_plec.pos_frameno(subsel3), 'rx','Markersize',3);
+           
+            
+            legend('free plec','free Condensin','plec near Cnd','Condensin near plec');
             legend('Location', 'NorthOutside');
             
             xlim([0 roiwidth]);
             ylim([0 roiheight]);
             title(Replace_underscores(roiname));
             
-            %[sh,~,~]=ginput(2); 
+           % [~,~,~]=ginput(2); 
             %xshift=sh(2)-sh(1) %output shift
-            target=strcat(plot_outpath, 'EKMcp_A040_',roiname, '_selections');
+            target=strcat(plot_outpath, 'EKMcp_A040_',roiname, '_selections.jpg');
             saveas(gcf,target,'jpg');    
-            pause(1);
+            pause(0.5);
             close(gcf); 
       
       
@@ -103,7 +107,6 @@ close all;
         info_out.content_peakvals=info.content_peakvals(sel);
         info_out.content_perspot_est=info.content_perspot_est(sel);
         info_out.content_perspot=info.content_perspot_meas(sel);
-        
         info_out.mindist_label1_label2=info.mindist_label1_label2(sel);
         
         if isfield(info,'farfrom_dna_edges'),

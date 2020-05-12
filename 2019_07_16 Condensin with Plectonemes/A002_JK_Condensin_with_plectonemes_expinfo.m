@@ -12,12 +12,38 @@ function expinfo=A002_JK_Condensin_with_plectonemes_expinfo(expi,roi);
 
 %expinfo.channelshift=0.6022; %manually per ROI....  
 switch expi
+    case 0,   expinfo=get_roiproperties_of_2019_09_02_NumberOfCondensinPerDNA(roi);
     case 1,   expinfo=get_roiproperties_of_2019_07_15_condensin_supercoil(roi);          
     case 2,   expinfo=get_roiproperties_of_2019_07_26_condensin_supercoil_no_ATP(roi);         
     case 3,   expinfo=get_roiproperties_of_2019_09_02_NumberOfCondensinPerDNA(roi);  
     case 4,   expinfo=get_roiproperties_of_2020_01_13_MukBEF_msd_wATP(roi); 
     case 5,   expinfo=get_roiproperties_of_2020_05_05_data_sc_cnd(roi);
+      case 11,  expinfo=get_roiproperties_of_Atto_condensin_42kb_nicking(roi); 
 end
+
+function expinfo=get_roiproperties_of_Atto_condensin_42kb_nicking(roi); 
+        %'Atto_condensin_22kb_non_nicking\'
+        expinfo.labelname='Condensin'; %no condensin channel
+        expinfo.tres_pk_DNA=0.4;      %used for final peak selection; fraction of first 90% %change this for more conservative peak detection
+        expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
+        roiprops=[...  %no  x1  y1  x2   y2     wd  drx dry chanshift
+                        1   9  9   26   105    15  -4  -3   0; %shift upwards (-) ;leftwards (-)
+                        2   19  2   28   84    14  -7  -4   0;
+                        3   22  8   18  93   18   -6  -3  0;
+                         4   24  8   23   153    15   -7   -2  0;
+%                         5   8  6   11   99   18  -4   -3  0;
+%                         6   18  4  19   88   10   -5   -2  0;
+%                         7   25  23   21   102  11  -6   -3  0;
+%                         8   36  13   31  93    12   -7  -2 0;
+%                          9   24  10   21   59    11   -4   -3 0;
+%                          10  20  12    18   48    10   -2   -1  0; %might be surface-affected
+%                          11  15  11   16   140   20   0   0  0;
+%                          11  15  11   16   140   20   0   0  0;
+];
+         expinfo.endpoints_xy=[roiprops(roi,2:3) ; roiprops(roi,4:5)]; %in image x1 y1 x2 y2   
+         expinfo.driftxy=roiprops(roi,7:8); %deltax, deltay %between startframe and endframe
+         expinfo.kymowidth=roiprops(roi,6); %adjust with neighbours nearby
+         expinfo.channelshift=roiprops(roi,9); %manually per ROI.... 
 
 function expinfo=get_roiproperties_of_2020_01_13_MukBEF_msd_wATP(roi); 
         %'2019_07_26 condensin_supercoil_no_ATP\'
