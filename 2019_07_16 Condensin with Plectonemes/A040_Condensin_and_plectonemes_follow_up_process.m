@@ -31,13 +31,15 @@ close all;
     switch selection
         case 'Cnd_plectoneme_associated'
             sel=find(... 
-            (info_Cnd_allROIs.label.label1_label2associated==1));
+            (info_Cnd_allROIs.label.label1_label2associated==1)&...
+            (info_Cnd_allROIs.label.farfrom_dna_edges)==1);
             info_Cnd_near_plec=shrink_info(info_Cnd_allROIs,sel);
             SaveName=['EKMcp_A040_AllROI_',selection,'.mat'];
             save([inpath,SaveName],'info_Cnd_near_plec'); 
        case 'Cnd_free'
             sel=find(...       
-            (info_Cnd_allROIs.label.label1_label2associated==0));
+            (info_Cnd_allROIs.label.label1_label2associated==0)&...
+            (info_Cnd_allROIs.label.farfrom_dna_edges==1));
             info_Cnd_free=shrink_info(info_Cnd_allROIs,sel);
             SaveName=['EKMcp_A040_AllROI_',selection,'.mat'];
             save([inpath,SaveName],'info_Cnd_free'); 

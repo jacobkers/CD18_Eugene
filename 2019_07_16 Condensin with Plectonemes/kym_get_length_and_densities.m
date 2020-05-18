@@ -23,8 +23,8 @@ function [info_DNA,info_Cnd]=kym_get_length_and_densities(info_DNA,info_Cnd,kymo
    end
    
    %% add some classification for the condensin
-   isawayfromDNAedges=(info_Cnd.pos_X_pix>curvestart+3)&...
-                      (info_Cnd.pos_X_pix<curvestop-3);
+   isawayfromDNAedges=(info_Cnd.pos_X_pix>curvestart)&...
+                      (info_Cnd.pos_X_pix<curvestop);
                   
    info_Cnd.classify.awayfromDNAedges=isawayfromDNAedges;
    

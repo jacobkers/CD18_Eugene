@@ -12,7 +12,7 @@ function init=A001_JK_condensin_with_plectonemes_init(expi);
 %References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
 %:JWJK_A-----[add ABCorC*---------------------------------------------------
 
-switch 2
+switch 1
     case 1
     %local paths
     init.datapathin=swap_path('CD_Data_in\2018_Eugene\');                      %loading
