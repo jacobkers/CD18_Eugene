@@ -64,13 +64,14 @@ close all;
   for ii=1:N_roi
       close all;
       roiname=info_Cnd_per_ROI.SaveName{ii};
+      roinumber=init.AllExp(ii);
       roiwidth=info_Cnd_per_ROI.kymo_width(ii);
       roiheight=info_Cnd_per_ROI.kymo_duration(ii);
       channelshift=info_Cnd_per_ROI.channelshift(ii);
-      subsel1=find(ii==info_DNA_near_Cnd.pos_roino);
-      subsel2=find(ii==info_DNA_free.pos_roino);
-      subsel3=find(ii==info_Cnd_near_plec.pos_roino);
-      subsel4=find(ii==info_Cnd_free.pos_roino);
+      subsel1=find(roinumber==info_DNA_near_Cnd.pos_roino);
+      subsel2=find(roinumber==info_DNA_free.pos_roino);
+      subsel3=find(roinumber==info_Cnd_near_plec.pos_roino);
+      subsel4=find(roinumber==info_Cnd_free.pos_roino);
       subplot(1,2,1); 
             plot(info_DNA_free.pos_X_subpix(subsel2)+channelshift, info_DNA_free.pos_frameno(subsel2), 'co','Markersize',2); hold on;
             plot(info_Cnd_free.pos_X_subpix(subsel4), info_Cnd_free.pos_frameno(subsel4), 'go','Markersize',2);

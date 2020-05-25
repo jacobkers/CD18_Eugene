@@ -35,6 +35,7 @@ inpath=strcat(init.datapathout, 'matlabresults\',init.expname,'\');
 close all;
 for roi=1:LE  
     Exp=strcat(init.roidirname,num2str(AllExp(roi)));
+    roino=AllExp(roi);
     switch usr
     case 'Jacob',  expinfo=A002_JK_Condensin_with_plectonemes_expinfo(expi,AllExp(roi));
     case 'Eugene', expinfo=A002_EK_Condensin_with_plectonemes_expinfo(expi,AllExp(roi));
@@ -59,7 +60,7 @@ for roi=1:LE
     info_Cnd_per_ROI.SaveName{roi}=char(strcat('Roi_',Exp)); 
     
     Ld=length(info_DNA.pos_frameno);
-    pos_roino_DNA=0*(1:Ld)+roi; 
+    pos_roino_DNA=0*(1:Ld)+roino; 
     info_DNA_allROIs.pos_roino=[info_DNA_allROIs.pos_roino pos_roino_DNA];
     info_DNA_allROIs.pos_frameno=[info_DNA_allROIs.pos_frameno info_DNA.pos_frameno];
     info_DNA_allROIs.pos_X_pix=[info_DNA_allROIs.pos_X_pix info_DNA.pos_X_pix];
@@ -69,7 +70,7 @@ for roi=1:LE
     info_DNA_allROIs.content_perspot_meas=[info_DNA_allROIs.content_perspot_meas info_DNA.content_perspot_meas];
     
     Lc=length(info_Cnd.pos_frameno);
-    pos_roino_Cnd=0*(1:Lc)+roi;Lc=length(info_Cnd.pos_frameno); 
+    pos_roino_Cnd=0*(1:Lc)+roino;Lc=length(info_Cnd.pos_frameno); 
     info_Cnd_allROIs.pos_roino=[info_Cnd_allROIs.pos_roino pos_roino_Cnd];
     info_Cnd_allROIs.pos_frameno=[info_Cnd_allROIs.pos_frameno info_Cnd.pos_frameno];
     info_Cnd_allROIs.pos_X_pix=[info_Cnd_allROIs.pos_X_pix info_Cnd.pos_X_pix+corr];

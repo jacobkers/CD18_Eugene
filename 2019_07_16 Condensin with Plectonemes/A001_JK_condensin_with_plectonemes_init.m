@@ -33,7 +33,7 @@ addpath(genpath(swap_path('Dropbox\CD_recent\BN_CD18_Eugene\Matlab\Matlab_tools_
 switch expi
      case 0  %counting condensins; TEST
         init.expname='2019_09_02 NumberOfCondensinPerDNA\';  %directory name                
-        init.AllExp=[1 2];        %numbers of various rois
+        init.AllExp=[1 2 ];        %numbers of various rois
         init.roidirname='M';
     case 1  %'2019_07_15 condensin_supercoil\' 
         init.expname='2019_07_15 condensin_supercoil\';  %directory name        
