@@ -6,16 +6,16 @@ function A000_condensin_with_plectonemes_main
 %:JWJK_A-----[add ABCorC*---------------------------------------------------
 
 %% Setting up the user paths
-override_userpaths_to_sharedpaths=1;  
+override_userpaths_to_sharedpaths=0;  
 %setting this to one overwrites local paths and uses shared paths (be sure
 %the raw data is there)
-switch 1
+switch 2
     case 1, usr='Eugene';  
         expi=9; %'%Atto_condensin_42kb_non_nicking\'
         init=A001_EK_condensin_with_plectonemes_init(expi);
     case 2, usr='Jacob';
         expi=0; %'2019_09_02_NumberOfCondensinPerDNA\'  TEST 
-        expi=3; %'2019_09_02_NumberOfCondensinPerDNA\'  all rois 
+        %expi=3; %'2019_09_02_NumberOfCondensinPerDNA\'  all rois 
         init=A001_JK_condensin_with_plectonemes_init(expi);
 end
 
