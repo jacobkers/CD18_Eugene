@@ -32,8 +32,9 @@ close all;
 %each step stores new data&reloads from former step 
     
     if 1,   %clean up
-        info_Cnd_allROIs=spots0_cleanup_spots(info_Cnd_allROIs);
-        save([outpath,SaveName],'info_Cnd_allROIs', '-append'); 
+        info_Cnd_allROIs=spots0_cleanup_spots(info_Cnd_allROIs,'condensin'); 
+        info_DNA_allROIs=spots0_cleanup_spots(info_DNA_allROIs,'plectoneme');
+        save([outpath,SaveName],'info_Cnd_allROIs','info_DNA_allROIs', '-append'); 
     end    
     %relate condensin to DNA 
     if 1        

@@ -7,6 +7,7 @@ function A040_Condensin_and_plectonemes_follow_up_process(init,expi,usr)
 %References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
 %:JWJK_A-------------------------------------------------------------------
 close all;
+actions.backsaving=1;
 
 %% 1) Set common paths; use standardized naming
 
@@ -23,39 +24,46 @@ close all;
     
     
 %% 2 collect specific type of spots and re-save
+  
+    info_DNA_allROIs=add_spot_context(info_DNA_allROIs,info_Cnd_allROIs,init);
+    info_Cnd_allROIs=add_spot_context(info_Cnd_allROIs,info_DNA_allROIs,init);
     %example: indices of all plectoneme-associated condensin
     selections=[{'Cnd_plectoneme_associated'},{'Cnd_free'},...
                 {'plectoneme_Cnd_associated'},{'plectoneme_free'}];
     for sc=1:length(selections)
     selection=char(selections{sc});
     switch selection
-        case 'Cnd_plectoneme_associated'
+        case 'Cnd_plectoneme_associated'           
             sel=find(... 
             (info_Cnd_allROIs.label.label1_label2associated==1)&...
-            (info_Cnd_allROIs.label.farfrom_dna_edges)==1);
-            info_Cnd_near_plec=shrink_info(info_Cnd_allROIs,sel);
-            info_Cnd_near_plec=add_persistence_flag(info_Cnd_near_plec,init);
-            
+            (info_Cnd_allROIs.label.farfrom_dna_edges==1)&...;
+             info_Cnd_allROIs.label.nearto_otherspot_XT==1);
+        
+            info_Cnd_near_plec=shrink_info(info_Cnd_allROIs,sel); 
             SaveName=['EKMcp_A040_AllROI_',selection,'.mat'];
             save([inpath,SaveName],'info_Cnd_near_plec'); 
        case 'Cnd_free'
             sel=find(...       
             (info_Cnd_allROIs.label.label1_label2associated==0)&...
-            (info_Cnd_allROIs.label.farfrom_dna_edges==1));
-            info_Cnd_free=shrink_info(info_Cnd_allROIs,sel);
-            info_Cnd_free=add_persistence_flag(info_Cnd_free,init);
+            (info_Cnd_allROIs.label.farfrom_dna_edges==1)&...
+            (info_Cnd_allROIs.label.nearto_otherspot_XT==0));
+        
+            info_Cnd_free=shrink_info(info_Cnd_allROIs,sel);          
             SaveName=['EKMcp_A040_AllROI_',selection,'.mat'];
             save([inpath,SaveName],'info_Cnd_free'); 
        case 'plectoneme_Cnd_associated'
-            sel=find((info_DNA_allROIs.label.label1_label2associated==1));
-            info_DNA_near_Cnd=shrink_info(info_DNA_allROIs,sel);
-            info_DNA_near_Cnd=add_persistence_flag(info_DNA_near_Cnd,init);
+            sel=find((info_DNA_allROIs.label.label1_label2associated==1)&...
+                     (info_DNA_allROIs.label.nearto_otherspot_XT==1));
+            
+            info_DNA_near_Cnd=shrink_info(info_DNA_allROIs,sel);          
             SaveName=['EKMcp_A040_AllROI_',selection,'.mat'];
             save([inpath,SaveName],'info_DNA_near_Cnd'); 
       case 'plectoneme_free'
-            sel=find((info_DNA_allROIs.label.label1_label2associated==0));
-            info_DNA_free=shrink_info(info_DNA_allROIs,sel);
-            info_DNA_free=add_persistence_flag(info_DNA_free,init);
+            sel=find((info_DNA_allROIs.label.label1_label2associated==0)&...
+                     (info_DNA_allROIs.label.nearto_otherspot_XT==0));
+            
+                 info_DNA_free=shrink_info(info_DNA_allROIs,sel);
+            
             SaveName=['EKMcp_A040_AllROI_',selection,'.mat'];
             save([inpath,SaveName],'info_DNA_free'); 
     end
@@ -63,60 +71,88 @@ close all;
   dum=1;
   
   
-  %% plot menu
+  %% actions per roi, per type
   %%for example, plot all selections per ROI
   N_roi=length(init.AllExp);
+  
   for ii=1:N_roi
       close all;
       roiname=info_Cnd_per_ROI.SaveName{ii};
       roinumber=init.AllExp(ii);
+      
       roiwidth=info_Cnd_per_ROI.kymo_width(ii);
       roiheight=info_Cnd_per_ROI.kymo_duration(ii);
       channelshift=info_Cnd_per_ROI.channelshift(ii);
-      subsel1=find(roinumber==info_DNA_near_Cnd.pos_roino);
-      subsel2=find(roinumber==info_DNA_free.pos_roino);
-      subsel3=find(roinumber==info_Cnd_near_plec.pos_roino);
-      subsel4=find(roinumber==info_Cnd_free.pos_roino);
+      
+      roisel_dna_near_cnd=find(roinumber==info_DNA_near_Cnd.pos_roino);
+      roisel_dna_free=find(roinumber==info_DNA_free.pos_roino);
+      roisel_cnd_near_dna=find(roinumber==info_Cnd_near_plec.pos_roino);
+      roisel_cnd_free=find(roinumber==info_Cnd_free.pos_roino);
       
       
-      hx=linspace(1,500,50);
-      data_to_count=info_Cnd_near_plec.neighbour_count(subsel3);
-      hist_neighbour_Cnd_near_plec=hist(data_to_count,hx);
-      hist_neighbour_Cnd_near_plec(end)=-5;
+      if actions.backsaving
+        kymo_plec_free=kym_build_selected_kymo_from_points(info_DNA_free,roisel_dna_free,roiwidth,roiheight,init,'free');
+        kymo_plec_near_cnd=kym_build_selected_kymo_from_points(info_DNA_near_Cnd,roisel_dna_near_cnd,roiwidth,roiheight,init,'free');
+        Exp=strcat(init.roidirname,num2str(roinumber));
+        savepth=[init.datapathin,init.expname,Exp]; 
+        curpth=pwd; cd (savepth); if ~isdir('backsaved'), mkdir('backsaved'); end; cd(curpth);
+        dlmwrite([savepth,'\backsaved\EKMcp_A040_Kymograph_plec_free.txt'],kymo_plec_free);
+        dlmwrite([savepth,'\backsaved\EKMcp_A040_Kymograph_plec_near_cnd.txt'],kymo_plec_near_cnd);
+      end
       
-      data_to_count=info_Cnd_free.neighbour_count(subsel4);
-      hist_neighbour_Cnd_free=hist(data_to_count,hx);
-      hist_neighbour_Cnd_free(end)=-5;
-      close all;
       
       
-      subplot(1,2,1); 
-            plot(info_DNA_free.pos_X_subpix(subsel2)+channelshift, info_DNA_free.pos_frameno(subsel2), 'co','Markersize',2); hold on;
-            plot(info_Cnd_free.pos_X_subpix(subsel4), info_Cnd_free.pos_frameno(subsel4), 'go','Markersize',2);
-             plot(info_DNA_near_Cnd.pos_X_subpix(subsel1)+channelshift, info_DNA_near_Cnd.pos_frameno(subsel1), 'bo','Markersize',2); hold on;
-            plot(info_Cnd_near_plec.pos_X_subpix(subsel3), info_Cnd_near_plec.pos_frameno(subsel3), 'rx','Markersize',3);
+      
+      
+      
+      
+      %% plot per roi
+      close all;    
+      subplot(1,3,1); 
+            plot(info_DNA_free.pos_X_subpix(roisel_dna_free)+channelshift, info_DNA_free.pos_frameno(roisel_dna_free), 'co','Markersize',2); hold on;
+            plot(info_Cnd_free.pos_X_subpix(roisel_cnd_free), info_Cnd_free.pos_frameno(roisel_cnd_free), 'go','Markersize',2);
+             plot(info_DNA_near_Cnd.pos_X_subpix(roisel_dna_near_cnd)+channelshift, info_DNA_near_Cnd.pos_frameno(roisel_dna_near_cnd), 'bo','Markersize',2); hold on;
+            plot(info_Cnd_near_plec.pos_X_subpix(roisel_cnd_near_dna), info_Cnd_near_plec.pos_frameno(roisel_cnd_near_dna), 'rx','Markersize',3);
             legend('free plec','free Condensin','plec near Cnd','Condensin near plec');
             legend('Location', 'NorthOutside');           
             xlim([0 roiwidth]);
             ylim([0 roiheight]);
             title(Replace_underscores(roiname));
-                        
-       subplot(2,2,2);  
-            bar(hx,hist_neighbour_Cnd_near_plec,'r');
-            ylabel('counts');
-            xlabel('#neigbours-t');
-            legend('condensin, near plec');
-            axis tight
-            xlim([0 max(hx);]);
             
-      subplot(2,2,4); 
-            bar(hx,hist_neighbour_Cnd_free,'g');
-            ylabel('counts');
-            xlabel('#neighbours-t, frames');
-            legend('condensin, free');
-            axis tight
-            xlim([0 max(hx);]);
-      
+      if actions.backsaving
+        subplot(1,3,2); pcolor(kymo_plec_free); shading flat, colormap hot; title('free plec');
+        subplot(1,3,3); pcolor(kymo_plec_near_cnd); shading flat, colormap hot; title('near cnd');
+        pause(0.1);
+      end
+
+       
+%         if 0
+%           hx=linspace(1,500,50);
+%           data_to_count=info_Cnd_near_plec.neighbour_count(roisel_cnd_near_dna);
+%           hist_neighbour_Cnd_near_plec=hist(data_to_count,hx);
+%           hist_neighbour_Cnd_near_plec(end)=-5;
+% 
+%           data_to_count=info_Cnd_free.neighbour_count(roisel_cnd_free);
+%           hist_neighbour_Cnd_free=hist(data_to_count,hx);
+%           hist_neighbour_Cnd_free(end)=-5;
+%  
+%  
+%            subplot(2,3,2);  
+%                 bar(hx,hist_neighbour_Cnd_near_plec,'r');
+%                 ylabel('counts');
+%                 xlabel('#neigbours-t');
+%                 legend('condensin, near plec');
+%                 axis tight
+%                 xlim([0 max(hx);]);
+% 
+%           subplot(2,3,5); 
+%                 bar(hx,hist_neighbour_Cnd_free,'g');
+%                 ylabel('counts');
+%                 xlabel('#neighbours-t, frames');
+%                 legend('condensin, free');
+%                 axis tight
+%                 xlim([0 max(hx);]);
+%          end
             target=strcat(plot_outpath, 'EKMcp_A040_',roiname, '_selections.jpg');
             saveas(gcf,target,'jpg');    
             pause(0.5);
