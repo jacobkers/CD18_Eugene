@@ -1,4 +1,4 @@
-function kymo=kym_build_selected_kymo_from_points(info,subsel,roiwidth,roiheight,init,label)
+function kymo=kym_build_selected_kymo_from_points(info,subsel,roiwidth,roiheight,init)
 %this function builds an artificial kymograph from a collection of points, 
 %to be used for tracking
 
