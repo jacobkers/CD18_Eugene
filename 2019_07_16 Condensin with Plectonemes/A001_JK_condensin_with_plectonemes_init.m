@@ -19,7 +19,7 @@ switch 1
     init.datapathout=swap_path('Dropbox\CD_Data_out\2018_Eugene\');            %saving
     case 2
     %test mode paths (should work from anywhere)
-    init.datapathin=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_in\Eugene\2019_CondensinWithPlectonemes\'];                      %loading
+    init.datapathin=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_in\Eugene\'];                      %loading
     init.datapathout=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_out\Eugene\'];            %saving
 end
 addpath(genpath(swap_path('Dropbox\CD_recent\BN_CD18_Eugene\Matlab\Matlab_tools_CD18EK\'))); %tools:
@@ -31,9 +31,14 @@ addpath(genpath(swap_path('Dropbox\CD_recent\BN_CD18_Eugene\Matlab\Matlab_tools_
 %% Add the experiment subdirectory names  to the list below, following the same naming formats
 %as the other experiments
 switch expi
+     case -1  %counting condensins; Simulation
+        init.expname='2020_08_18 Simulation\';  %directory name                
+        init.AllExp=[1];        %numbers of various rois
+        init.roidirname='M';
      case 0  %counting condensins; TEST
         init.expname='2019_09_02 NumberOfCondensinPerDNA\';  %directory name                
         init.AllExp=[1:10];        %numbers of various rois
+        init.AllExp=[2];        %numbers of various rois
         init.roidirname='M';
     case 1  %'2019_07_15 condensin_supercoil\' 
         init.expname='2019_07_15 condensin_supercoil\';  %directory name        
@@ -59,14 +64,19 @@ switch expi
         init.expname='Atto_condensin_42kb_nicking\';  %directory name                   
         init.AllExp=[1 2 3 4];        %numbers of various rois
         init.roidirname='ROI';
+   case 12  %Atto_condensin_42kb_nicking
+        init.expname='WT_condensin_42kb_non_nicking\';  %directory name                   
+        init.AllExp=[1:21];        %numbers of various rois
+        %init.AllExp=[1];        %numbers of various rois
+        init.roidirname='ROI';
 end
 
 init.psf_est=2.7; 
 %estimated point spread function (used for estimated peak content and localization)
 
 %kymograph settings
-init.t_smooth=10;           %for kymographs, in frames 
-init.x_smooth=4;            %for kymographs, in pixels 
+init.t_smooth=1;           %for kymographs, in frames. If 1, no smoothing
+init.x_smooth=3;            %for kymographs, in pixels. If 1, no smoothing 
 init.tresholdsigmas=2;      %number of sigmas beyond background noise,..
                             %..used for getting fluorescence counts and levels
 

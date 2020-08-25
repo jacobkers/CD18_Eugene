@@ -13,9 +13,7 @@ function info_1=classify_labels(info_1,info_2,psf_est,corr,spot_type);
                     % content_peakvals
                     % content_perspot_est
                     % content_perspot_meas
-         
-         
-         
+             
          %% label-specific: build some specific fields
          switch spot_type
              case 'condensin'

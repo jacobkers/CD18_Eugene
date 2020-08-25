@@ -22,20 +22,21 @@ close all;
     save([outpath,SaveName],'info_DNA_allROIs','info_Cnd_allROIs','info_Cnd_per_ROI','info_DNA_per_ROI'); 
     
 
-    subplot(1,2,1);
-    plot(info_DNA_allROIs.pos_X_subpix, info_DNA_allROIs.pos_frameno, 'bo','Markersize',2); hold on;
-            plot(info_Cnd_allROIs.pos_X_subpix, info_Cnd_allROIs.pos_frameno, 'ro','Markersize',1);
+    %subplot(1,2,1);
+    plot(info_DNA_allROIs.pos_frameno, info_DNA_allROIs.pos_X_subpix, 'bo','Markersize',2); hold on;
+            plot(info_Cnd_allROIs.pos_frameno, info_Cnd_allROIs.pos_X_subpix,  'ro','Markersize',1);
             title('Overlay all data')
             legend('plec', 'cond');
-    xlim([1 100]);
+            ylim([0 80]);
 %% 4 more steps; 
 %each step stores new data&reloads from former step 
     
-    if 1,   %clean up
-        info_Cnd_allROIs=spots0_cleanup_spots(info_Cnd_allROIs,'condensin'); 
-        info_DNA_allROIs=spots0_cleanup_spots(info_DNA_allROIs,'plectoneme');
+    %clean up
+    pass_all=1;
+        info_Cnd_allROIs=spots0_cleanup_spots(info_Cnd_allROIs,'condensin',pass_all); 
+        info_DNA_allROIs=spots0_cleanup_spots(info_DNA_allROIs,'plectoneme',pass_all);
         save([outpath,SaveName],'info_Cnd_allROIs','info_DNA_allROIs', '-append'); 
-    end    
+    
     %relate condensin to DNA 
     if 1        
         subplot(2,2,2);

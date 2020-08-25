@@ -51,8 +51,12 @@ if actions.buildkymographs
         dna_pth=char(strcat(generaldatapth, Exp,'\', Channel_list(1)));
         condensin_pth=char(strcat(generaldatapth, Exp,'\', Channel_list(2)));
         
-        kymo_DNA=kym_build_kymo_from_movie(dna_pth,expinfo);       
-        kymo_Cnd=kym_build_kymo_from_movie(condensin_pth,expinfo);             
+        if expi~=-1
+            kymo_DNA=kym_build_kymo_from_movie(dna_pth,expinfo);       
+            kymo_Cnd=kym_build_kymo_from_movie(condensin_pth,expinfo); 
+        else
+            [kymo_DNA,kymo_Cnd]=kym_simulate_extrusion(0);
+        end
         save(strcat(SaveName, '_allresults.mat'), 'kymo_DNA','kymo_Cnd');
         
         if actions.backsaving %optional back-saving a kymograph  for later use (for example, using 'boxtrack')
@@ -61,9 +65,9 @@ if actions.buildkymographs
         
         if 1
         figure(64); 
-            subplot(1,2,1); pcolor(kymo_DNA); shading flat; colormap hot; 
+            subplot(2,1,1); pcolor(kymo_DNA'); shading flat; colormap hot; 
             title('DNA');
-            subplot(1,2,2); pcolor(kymo_Cnd); shading flat; colormap hot; 
+            subplot(2,1,2); pcolor(kymo_Cnd'); shading flat; colormap hot; 
             title('Condensin');
             %[~]=ginput(1); 
             saveas(gcf,strcat(SaveName, '_kymographs.jpg'),'jpg'); 
@@ -84,29 +88,28 @@ if actions.peakdetection
     
     
     %get some general properties  
-        %Condensin
-        levels_Cnd=kym_get_signal_levels(kymo_Cnd,init.tresholdsigmas);
+        %% Condensin
+        levels_Cnd=kym_get_signal_levels(kymo_Cnd,init);
         kymo_Cnd_peaks=kym_keep_only_peaks(kymo_Cnd,levels_Cnd); %shave off loops  
-        info_Cnd=kym_peakfitperkymographline(kymo_Cnd,'flatbottom', psf_est,expinfo.tres_pk_Cnd); %build spot info!
+        tresH=6*levels_Cnd.noise_all;
+        %info_Cnd=kym_peakfitperkymographline(kymo_Cnd,'flatbottom', psf_est,expinfo.tres_pk_Cnd); %build spot info!
+        info_Cnd=kym_peakfitperkymographline(kymo_Cnd,'just_treshold', psf_est,tresH); %build spot info!
         
         
         
-        %DNA
-        levels_DNA=kym_get_signal_levels(kymo_DNA,init.tresholdsigmas);  
+        %% DNA
+        levels_DNA=kym_get_signal_levels(kymo_DNA,init);  
         kymo_DNA=kym_convert_dna_kymo(kymo_DNA,levels_DNA);  %convert_DNA counts to_genomic_percentage;
-        levels_DNA=kym_get_signal_levels(kymo_DNA,init.tresholdsigmas);  % repeat levels 
+        levels_DNA=kym_get_signal_levels(kymo_DNA,init);  % repeat levels 
+        tresH=6*levels_DNA.noise_all;
         kymo_DNA_peaks=kym_keep_only_peaks(kymo_DNA,levels_DNA); %shave off loops  
-        info_DNA=kym_peakfitperkymographline(kymo_DNA_peaks,'just_treshold', psf_est,expinfo.tres_pk_DNA);   %build spot info!
-        
-        [info_DNA,info_Cnd]=kym_get_length_and_densities(info_DNA,info_Cnd,kymo_DNA);
-     
- 
+        %info_DNA=kym_peakfitperkymographline(kymo_DNA_peaks,'just_treshold', psf_est,expinfo.tres_pk_DNA);   %build spot info!
+        info_DNA=kym_peakfitperkymographline(kymo_DNA_peaks,'just_treshold', psf_est,tresH);   %build spot info!        
+        [info_DNA,info_Cnd]=kym_get_length_and_densities(info_DNA,info_Cnd,kymo_DNA);      
         save(strcat(SaveName,'_allresults.mat'),'info_DNA','info_Cnd',...
                             'kymo_DNA_peaks', 'kymo_Cnd_peaks', '-append');    
 end
 
-
-dum=1;
 
 %% plotting
 if actions.plot>0       
@@ -133,36 +136,36 @@ if actions.plot>0
 %             pcolor(plotpic_Cnd); shading flat; colormap jet; hold on;
 %             title('Condensin');
 
-       subplot(1,3,2); 
-            plot(info_DNA.pos_X_subpix+expinfo.channelshift, info_DNA.pos_frameno, 'bo','Markersize',4); hold on;
-            plot(info_Cnd.pos_X_subpix, info_Cnd.pos_frameno, 'ro','Markersize',2);
-            xlim([0 length(kymo_DNA(1,:))]);
-            ylim([0 length(kymo_DNA(:,1))]);
-            title(Exp);
-            legend('DNA','Condensin')
-            %[sh,~,~]=ginput(2); 
-            %xshift=sh(2)-sh(1) %output shift
-            saveas(gcf,strcat(SaveName, '_plectonemecounts.jpg'),'jpg');    
-            pause(1);
-            close(gcf); 
+      
+            
             
             if 1
-        figure(165); 
-            subplot(1,2,1); pcolor(kymo_DNA); shading flat; colormap hot; hold on;
-            plot(info_DNA.pos_X_subpix+expinfo.channelshift, info_DNA.pos_frameno, 'wo','Markersize',1); hold on;           
-            xlim([0 length(kymo_DNA(1,:))]);
-            ylim([0 length(kymo_DNA(:,1))]);
+        %figure(165); 
+            subplot(3,1,1); pcolor(kymo_DNA'); shading flat; colormap hot; hold on;
+            plot( info_DNA.pos_frameno,info_DNA.pos_X_subpix+expinfo.channelshift, 'bo','Markersize',3); hold on;           
+            ylim([0 length(kymo_DNA(1,:))]);
+            xlim([0 length(kymo_DNA(:,1))]);
             title('DNA');
-            subplot(1,2,2); pcolor(kymo_Cnd); shading flat; colormap hot; hold on;
-            plot(info_Cnd.pos_X_subpix, info_Cnd.pos_frameno, 'wo','Markersize',1);
-            xlim([0 length(kymo_DNA(1,:))]);
-            ylim([0 length(kymo_DNA(:,1))]);
+            subplot(3,1,2); pcolor(kymo_Cnd'); shading flat; colormap hot; hold on;
+            plot(info_Cnd.pos_frameno,info_Cnd.pos_X_subpix,  'bo','Markersize',3);
+            ylim([0 length(kymo_DNA(1,:))]);
+            xlim([0 length(kymo_DNA(:,1))]);
             title('Condensin');
-            pause(0.1);
+            pause(0.5);
             %[~]=ginput(1); 
+            subplot(3,1,3); 
+            plot(info_DNA.pos_frameno,info_DNA.pos_X_subpix+expinfo.channelshift,  'bo','Markersize',4); hold on;
+            plot(info_Cnd.pos_frameno, info_Cnd.pos_X_subpix, 'ro','Markersize',2);
+            ylim([0 length(kymo_DNA(1,:))]);
+            xlim([0 length(kymo_DNA(:,1))]);
+            title(Exp);
+            %legend('DNA','Condensin')
+            %[sh,~,~]=ginput(2); 
+            %xshift=sh(2)-sh(1) %output shift
+            
             saveas(gcf,strcat(SaveName, '_kymographs_overlays.jpg'),'jpg'); 
             
-            close(gcf);
+            %close(gcf);
         end
 end
 end

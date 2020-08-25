@@ -7,24 +7,21 @@ function A040_Condensin_and_plectonemes_follow_up_process(init,expi,usr)
 %References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
 %:JWJK_A-------------------------------------------------------------------
 close all;
-actions.backsaving=1;
+actions.backsaving=0;
 
-%% 1) Set common paths; use standardized naming
+%% 1) Set common paths; use standardized naming; collect all info from the selected rois
 
     AllExp=init.AllExp;
 %     Channel_list=[{'DNA\'}, {'Condensin\'}];  
 %     generaldatapth=[datapathin,expname,'\'];
     inpath=strcat(init.datapathout, 'matlabresults\',init.expname,'collected\');
-    plot_outpath=strcat(init.datapathout, 'matlabresults\',init.expname);
+    plot_outpath=strcat(init.datapathout, 'matlabresults\',init.expname,'\associationplots\');
+    if ~isdir(plot_outpath); mkdir(plot_outpath); end
     LoadName='EKMcp_A030_AllROI_allresults.mat';
-    
-
-%% 1 collect all info from the selected rois
     load([inpath,LoadName]); 
     
     
-%% 2 collect specific type of spots and re-save
-  
+%% 2 collect specific type of spots and re-save these as separate collections  
     info_DNA_allROIs=add_spot_context(info_DNA_allROIs,info_Cnd_allROIs,init);
     info_Cnd_allROIs=add_spot_context(info_Cnd_allROIs,info_DNA_allROIs,init);
     %example: indices of all plectoneme-associated condensin
@@ -53,8 +50,7 @@ actions.backsaving=1;
             save([inpath,SaveName],'info_Cnd_free'); 
        case 'plectoneme_Cnd_associated'
             sel=find((info_DNA_allROIs.label.label1_label2associated==1)&...
-                     (info_DNA_allROIs.label.nearto_otherspot_XT==1));
-            
+                     (info_DNA_allROIs.label.nearto_otherspot_XT==1)); 
             info_DNA_near_Cnd=shrink_info(info_DNA_allROIs,sel);          
             SaveName=['EKMcp_A040_AllROI_',selection,'.mat'];
             save([inpath,SaveName],'info_DNA_near_Cnd'); 
@@ -71,8 +67,8 @@ actions.backsaving=1;
   dum=1;
   
   
-  %% actions per roi, per type
-  %%for example, plot all selections per ROI
+  %% actions per roi, per type. 
+  %for example, plot all selections per ROI
   N_roi=length(init.AllExp);
   
   for ii=1:N_roi
@@ -90,9 +86,13 @@ actions.backsaving=1;
       roisel_cnd_free=find(roinumber==info_Cnd_free.pos_roino);
       
       
+      
+      %% Here, a kymograph is re-built from a specific point collection. 
+      %These kymographs can be used in other packages (such as ImageJ, or
+      %the 'boxtracking' tracking pack) 
       if actions.backsaving
-        kymo_plec_free=kym_build_selected_kymo_from_points(info_DNA_free,roisel_dna_free,roiwidth,roiheight,init,'free');
-        kymo_plec_near_cnd=kym_build_selected_kymo_from_points(info_DNA_near_Cnd,roisel_dna_near_cnd,roiwidth,roiheight,init,'free');
+        kymo_plec_free=kym_build_selected_kymo_from_points(info_DNA_free,roisel_dna_free,roiwidth,roiheight,init);
+        kymo_plec_near_cnd=kym_build_selected_kymo_from_points(info_DNA_near_Cnd,roisel_dna_near_cnd,roiwidth,roiheight,init);
         Exp=strcat(init.roidirname,num2str(roinumber));
         savepth=[init.datapathin,init.expname,Exp]; 
         curpth=pwd; cd (savepth); if ~isdir('backsaved'), mkdir('backsaved'); end; cd(curpth);
@@ -101,27 +101,23 @@ actions.backsaving=1;
       end
       
       
-      
-      
-      
-      
-      
+
       %% plot per roi
       close all;    
-      subplot(1,3,1); 
-            plot(info_DNA_free.pos_X_subpix(roisel_dna_free)+channelshift, info_DNA_free.pos_frameno(roisel_dna_free), 'co','Markersize',2); hold on;
-            plot(info_Cnd_free.pos_X_subpix(roisel_cnd_free), info_Cnd_free.pos_frameno(roisel_cnd_free), 'go','Markersize',2);
-             plot(info_DNA_near_Cnd.pos_X_subpix(roisel_dna_near_cnd)+channelshift, info_DNA_near_Cnd.pos_frameno(roisel_dna_near_cnd), 'bo','Markersize',2); hold on;
-            plot(info_Cnd_near_plec.pos_X_subpix(roisel_cnd_near_dna), info_Cnd_near_plec.pos_frameno(roisel_cnd_near_dna), 'rx','Markersize',3);
-            legend('free plec','free Condensin','plec near Cnd','Condensin near plec');
-            legend('Location', 'NorthOutside');           
-            xlim([0 roiwidth]);
-            ylim([0 roiheight]);
+      subplot(3,1,1); 
+            plot(info_DNA_free.pos_frameno(roisel_dna_free), info_DNA_free.pos_X_subpix(roisel_dna_free)+channelshift, 'co','Markersize',2); hold on;
+            plot(info_Cnd_free.pos_frameno(roisel_cnd_free), info_Cnd_free.pos_X_subpix(roisel_cnd_free),  'go','Markersize',2);
+            plot(info_Cnd_near_plec.pos_frameno(roisel_cnd_near_dna),info_Cnd_near_plec.pos_X_subpix(roisel_cnd_near_dna),  'rx','Markersize',4);
+            plot(info_DNA_near_Cnd.pos_frameno(roisel_dna_near_cnd),info_DNA_near_Cnd.pos_X_subpix(roisel_dna_near_cnd)+channelshift,  'b+','Markersize',2); hold on;
+            legend('free plec','free Condensin','Condensin near plec','plec near Cnd');
+            legend('Location', 'EastOutside');           
+            ylim([0 roiwidth]);
+            xlim([0 roiheight]);
             title(Replace_underscores(roiname));
             
       if actions.backsaving
-        subplot(1,3,2); pcolor(kymo_plec_free); shading flat, colormap hot; title('free plec');
-        subplot(1,3,3); pcolor(kymo_plec_near_cnd); shading flat, colormap hot; title('near cnd');
+        subplot(3,1,2); pcolor(kymo_plec_free); shading flat, colormap hot; title('free plec');
+        subplot(3,1,3); pcolor(kymo_plec_near_cnd); shading flat, colormap hot; title('near cnd');
         pause(0.1);
       end
 
@@ -153,10 +149,10 @@ actions.backsaving=1;
 %                 axis tight
 %                 xlim([0 max(hx);]);
 %          end
-            target=strcat(plot_outpath, 'EKMcp_A040_',roiname, '_selections.jpg');
+            target=strcat(plot_outpath, '/EKMcp_A040_',roiname, '_selections.jpg');
             saveas(gcf,target,'jpg');    
             pause(0.5);
-            close(gcf);  
+            %close(gcf);  
   end
   
  
