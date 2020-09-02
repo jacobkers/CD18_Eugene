@@ -28,6 +28,11 @@ init.datapathout=['C:\Users\eugenekim\Documents\supercoil\Data_Out\'];          
 %% Add the experiment subdirectory names  to the list below, following the same naming formats
 %as the other experiments
 switch expi
+    case -1  %counting condensins; Simulation
+        init.expname='2020_08_18 Simulation\';  %directory name                
+        init.AllExp=[1];        %numbers of various rois
+        init.roidirname='M';
+    
     case 1  %'2019_07_15 condensin_supercoil\' 
         init.expname='2019_07_15 condensin_supercoil\';  %directory name        
         init.AllExp=[1];        %numbers of various rois  
@@ -77,13 +82,18 @@ switch expi
         init.expname='Atto_condensin_42kb_nicking\';  %directory name                   
         init.AllExp=[1 2 3 4];        %numbers of various rois
         init.roidirname='ROI';
+    case 12  %Atto_condensin_42kb_nicking
+        init.expname='WT_condensin_42kb_non_nicking\';  %directory name                   
+        init.AllExp=[1:21];        %numbers of various rois
+        init.AllExp=[4];        %numbers of various rois
+        init.roidirname='ROI';
 end
 
 init.psf_est=1.7; 
 %estimated point spread function (used for estimated peak content and localization)
 
 %kymograph settings
-init.t_smooth=3;           %for kymographs, in frames 
+init.t_smooth=5;           %for kymographs, in frames 
 init.x_smooth=3;            %for kymographs, in pixels 
 init.tresholdsigmas=2;      %number of sigmas beyond background noise,..
                             %..used for getting fluorescence counts and levels

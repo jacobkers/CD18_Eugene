@@ -22,7 +22,7 @@ switch 1
     init.datapathin=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_in\Eugene\'];                      %loading
     init.datapathout=['M:\tnw\bn\cd\Shared\Jacob Kerssemakers\TESTdata_out\Eugene\'];            %saving
 end
-addpath(genpath(swap_path('Dropbox\CD_recent\BN_CD18_Eugene\Matlab\Matlab_tools_CD18EK\'))); %tools:
+addpath(genpath(swap_path('Dropbox\CD_recent\BN_CD18_Eugene\Matlab\BN_CD18_EK_CondensinTrack-master\'))); %tools:
 
  
 
@@ -67,7 +67,8 @@ switch expi
    case 12  %Atto_condensin_42kb_nicking
         init.expname='WT_condensin_42kb_non_nicking\';  %directory name                   
         init.AllExp=[1:21];        %numbers of various rois
-        %init.AllExp=[1];        %numbers of various rois
+        %init.AllExp=[1 4 6 7 12 14 15 16 19 20 21];        %numbers of various rois
+        init.AllExp=[1:41];        %numbers of various rois
         init.roidirname='ROI';
 end
 
@@ -75,7 +76,7 @@ init.psf_est=2.7;
 %estimated point spread function (used for estimated peak content and localization)
 
 %kymograph settings
-init.t_smooth=1;           %for kymographs, in frames. If 1, no smoothing
+init.t_smooth=3;           %for kymographs, in frames. If 1, no smoothing
 init.x_smooth=3;            %for kymographs, in pixels. If 1, no smoothing 
 init.tresholdsigmas=2;      %number of sigmas beyond background noise,..
                             %..used for getting fluorescence counts and levels

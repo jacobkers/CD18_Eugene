@@ -11,12 +11,11 @@ override_userpaths_to_sharedpaths=0;
 %the raw data is there)
 switch 2
     case 1, usr='Eugene';  
-        expi=9; %'%Atto_condensin_42kb_non_nicking\'
+        expi=12; %'%Atto_condensin_42kb_non_nicking\'
         init=A001_EK_condensin_with_plectonemes_init(expi);
     case 2, usr='Jacob';
-        expi=12; %init.expname='2020_08_18 Simulation\  SIM
-        %expi=0; %'2019_09_02_NumberOfCondensinPerDNA\'  TEST 
-        %expi=3; %'2019_09_02_NumberOfCondensinPerDNA\'  all rois 
+        expi=-1; %init.expname='2020_08_18 Simulation\  SIM
+        expi=12; 
         init=A001_JK_condensin_with_plectonemes_init(expi);
 end
 
@@ -24,15 +23,16 @@ if override_userpaths_to_sharedpaths
    mpth='M:\tnw\bn\cd\Shared\Jacob Kerssemakers\';  
    init.datapathin=[mpth 'TESTdata_in\Eugene\'];          %loading
    init.datapathout=[mpth 'TESTdata_out\Eugene\']; %saving
-   addpath(genpath(swap_path('Dropbox\CD_recent\BN_CD18_Eugene\Matlab\Matlab_tools_CD18EK\'))); %tools:
+   addpath(genpath(swap_path('D:\jkerssemakers\Dropbox\CD_recent\BN_CD18_Eugene\Matlab\BN_CD18_EK_CondensinTrack-master'))); %tools:
 end
         
 %% main shell
-if 1 
-    actions.buildkymographs=1;  %make raw kymographs
-    actions.peakdetection=1;    %detect peaks; convert to genomic percentage and condensin counts
+if 0 
+    actions.buildkymographs=0;  %make raw kymographs
+    actions.peakdetection=0;    %detect peaks; convert to genomic percentage and condensin counts
     A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi,usr,actions);
 end
+if 1, A025_content_plots(init,expi,usr); end
 if 0, A030_Condensin_and_plectonemes_process_positions(init,expi,usr) ; end
 if 0, A040_Condensin_and_plectonemes_follow_up_process(init,expi,usr) ; end
 clear all;

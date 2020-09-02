@@ -41,34 +41,54 @@ function expinfo=get_roiproperties_of_WT_condensin_42kb_non_nicking(roi);
         expinfo.labelname='DNA'; %no condensin channel
         expinfo.tres_pk_DNA=0.4;      %used for final peak selection; fraction of first 90% %change this for more conservative peak detection
         expinfo.tres_pk_Cnd=4;       %used for final peak selection; sigmas over noise
-        roiprops=[...  %no  x1  y1  x2   y2     wd  drx dry chanshift
-               1    16   3  25   119   14  0  0   0; 
-               2    34   8   8   58    17  0  0   0;
-               3    29  12  26   82   20   0  0  0;
-               4   16  10  26  83    15   0   0  0;
-               5   34  10  14  65   18  0   0  0;
-               6   10  2   8   65   15   0   0  0;
-               7   10  4   18  110   11  0   0  0;
-               8   9   5   25  90    17   0  0 0;
-               9   21  18  34  101   17   0   0 0;
-               10  15  15  27  101   17   0   0  0;
-               11  27  13   16   116  17   0   0  0;
-               12  10  5   20   88   17   0   0  0;
-               13  36  9   17   110   17   0   0  0;
-               14  20  8   26   113   20   0   0  0;
-               15  31  2   16   50   15   0   0  0;
-               16  18  12   31  53   20   0   0  0;
-               17  20  10   16  80   20   0   0  0;
-               18  24  9   15   113  11   -1   0  0;
-               19  25  9   9   124  11  -3   0  0;
-               20  8   9   33   65   14   0   0  0;
-               21  12  11  34   88   15   0   0  0;
+        roiprops=[...  %no  x1  y1  x2   y2     wd  drx dry chanshift padit           
+               1    16   3  25   119   14   0  0   0 0; 
+               2    34   8   8   58    17   0  0   0 0;
+               3    29  12  26   82   20    0  0   0 0;
+               4   16  10  26  83    15     0  0   0 1;
+               5   34  10  14  65   18      0  0   0 0;
+               6   10  2   8   65   15      0   0  0 1;
+               7   10  4   18  110   11     0   0  0 1;
+               8   9   5   25  90    17     0   0 0 0;
+               9   21  18  34  101   17     0   0 0 0;
+               10  15  15  27  101   17     0   0  0 0;
+               11  27  13   16   116  17    0   0  0 0;
+               12  10  5   20   88   17     0   0  0 1;
+               13  36  9   17   110   17    0   0  0 0;
+               14  20  8   26   113   20    0   0  0 1;
+               15  31  2   16   50   15     0   0  0 1;
+               16  18  12   31  53   20     0   0  0 1;
+               17  20  10   16  80   20     0   0  0 0;
+               18  24  9   15   113  11    -1   0  0 0;
+               19  25  9   9   124  11      -3   0  0 1;
+               20  8   9   33   65   14     0   0  0 1;
+               21  12  11  34   88   15     0   0  0 1;
+               22  16  9  18  88   10       0   0 0 0;
+               23  15  8   35   90  15      0   0  0 0;
+               24  15  8   17   74   15     0   0  0 0;
+               25  12  7   15   66   15     0   0  0 0;
+               26  11  9   14   69   17     0   0  0 0;
+               27  20  4   20   77   15   -4   0  0 0;
+               28  14  2   22  64   20      0   0  0 0;
+               29  26  11   14  73   17     0   0  0 0;
+               30  27  9   20   87  20      0   0  0 0;
+               31  12  21   56   56  20     0   0  0 0;
+               32  29  12  61   65   41   -2  -2  0 0;
+               33  15  12  24   114   20   0   0  0 0;
+               34  13  6   30   85   20     0   0  0 0;
+               35  14  12   22   114   20   0   0  0  0;
+               36  14  6   19   103   15   0   0  0 0;
+               37  14  5   19   104   15   0   0  0 0;
+               38  34  4   24  80   10   0   0  0 0;
+               39  30  10   31  142   10   0   0  0 0;
+               40  12  32   73   115  15   0   0  0 0;
+               41  16  6   25   107  10  0   0  0 0;
 ];
          expinfo.endpoints_xy=[roiprops(roi,2:3) ; roiprops(roi,4:5)]; %in image x1 y1 x2 y2   
          expinfo.driftxy=roiprops(roi,7:8); %deltax, deltay %between startframe and endframe
          expinfo.kymowidth=roiprops(roi,6); %adjust with neighbours nearby
          expinfo.channelshift=roiprops(roi,9); %manually per ROI....          
-         
+         if length(roiprops(1,:))>9, expinfo.pad_it=roiprops(roi,10); end
          
          
 function expinfo=get_roiproperties_of_Atto_condensin_42kb_nicking(roi); 

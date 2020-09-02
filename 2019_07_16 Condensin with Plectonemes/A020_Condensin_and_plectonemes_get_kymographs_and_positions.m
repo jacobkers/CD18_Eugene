@@ -28,8 +28,9 @@ expname=init.expname;
 AllExp=init.AllExp;
 
 generaldatapth=[datapathin,expname,'\'];
-outpath=strcat(datapathout, 'matlabresults\',expname,'\');
-if ~isdir(outpath), mkdir(outpath); end
+outpath0=strcat(datapathout, 'matlabresults\',init.expname,'\');
+outpath1=strcat(datapathout, 'matlabresults\',init.expname,'\A020_kymographs\');
+if ~isdir(outpath1), mkdir(outpath1); end
 
 
 
@@ -41,11 +42,13 @@ switch usr
     case 'Jacob',  expinfo=A002_JK_Condensin_with_plectonemes_expinfo(expi,AllExp(roi));
     case 'Eugene', expinfo=A002_EK_Condensin_with_plectonemes_expinfo(expi,AllExp(roi));
 end
-    SaveName=char(strcat(outpath,'EKMcp_A020_',Exp)); 
+    SaveName=char(strcat(outpath0,'EKMcp_A020_',Exp)); 
+    PlotSaveName=char(strcat(outpath1,'EKMcp_A020_',Exp)); 
+    
         
 %% Kymographs
 if actions.buildkymographs     
-    if mod(roi,1)==0, disp(strcat('Building kymograph:',expname,':Exps to work through:',num2str(LE-roi+1)));end     
+    if mod(roi,1)==0, disp(strcat('Building kymograph:',expname,'Roi:',num2str(roi),':Exps to work through:',num2str(LE-roi+1)));end     
     %% 1)make two kymographs 
         Channel_list=[{'DNA\'}, {expinfo.labelname}];  
         dna_pth=char(strcat(generaldatapth, Exp,'\', Channel_list(1)));
@@ -70,7 +73,7 @@ if actions.buildkymographs
             subplot(2,1,2); pcolor(kymo_Cnd'); shading flat; colormap hot; 
             title('Condensin');
             %[~]=ginput(1); 
-            saveas(gcf,strcat(SaveName, '_kymographs.jpg'),'jpg'); 
+            saveas(gcf,strcat(PlotSaveName, '_kymographs.jpg'),'jpg'); 
             pause(2);
             close(gcf);
         end
@@ -88,23 +91,28 @@ if actions.peakdetection
     
     
     %get some general properties  
-        %% Condensin
+        %% Condensin precook
         levels_Cnd=kym_get_signal_levels(kymo_Cnd,init);
         kymo_Cnd_peaks=kym_keep_only_peaks(kymo_Cnd,levels_Cnd); %shave off loops  
-        tresH=6*levels_Cnd.noise_all;
-        %info_Cnd=kym_peakfitperkymographline(kymo_Cnd,'flatbottom', psf_est,expinfo.tres_pk_Cnd); %build spot info!
-        info_Cnd=kym_peakfitperkymographline(kymo_Cnd,'just_treshold', psf_est,tresH); %build spot info!
+        tresH_Cnd=6*levels_Cnd.noise_all;
+     
         
         
         
-        %% DNA
-        levels_DNA=kym_get_signal_levels(kymo_DNA,init);  
+        %% DNA precook
+        levels_DNA=kym_get_signal_levels_DNA(kymo_DNA,init);  
         kymo_DNA=kym_convert_dna_kymo(kymo_DNA,levels_DNA);  %convert_DNA counts to_genomic_percentage;
-        levels_DNA=kym_get_signal_levels(kymo_DNA,init);  % repeat levels 
-        tresH=6*levels_DNA.noise_all;
-        kymo_DNA_peaks=kym_keep_only_peaks(kymo_DNA,levels_DNA); %shave off loops  
+        [levels_DNA,kymo_DNA_hat,kymo_DNA_peaks]=kym_get_signal_levels_DNA(kymo_DNA,init);  % repeat levels 
+        tresH_DNA=6*levels_DNA.noise_all;
+        %kymo_DNA_peaks=kym_keep_only_peaks(kymo_DNA,levels_DNA); %shave off loops  
         %info_DNA=kym_peakfitperkymographline(kymo_DNA_peaks,'just_treshold', psf_est,expinfo.tres_pk_DNA);   %build spot info!
-        info_DNA=kym_peakfitperkymographline(kymo_DNA_peaks,'just_treshold', psf_est,tresH);   %build spot info!        
+        
+        %% Positions DNA and Condnesin.
+        %Note that the residu is the DNA tether for both, in % of tether
+        %total
+        info_Cnd=kym_peakfitperkymographline(kymo_Cnd_peaks,kymo_DNA_hat,'just_treshold', psf_est,tresH_Cnd); %build spot info!
+        info_DNA=kym_peakfitperkymographline(kymo_DNA_peaks,kymo_DNA_hat, 'just_treshold', psf_est,tresH_DNA);   %build spot info!        
+        
         [info_DNA,info_Cnd]=kym_get_length_and_densities(info_DNA,info_Cnd,kymo_DNA);      
         save(strcat(SaveName,'_allresults.mat'),'info_DNA','info_Cnd',...
                             'kymo_DNA_peaks', 'kymo_Cnd_peaks', '-append');    
@@ -135,12 +143,8 @@ if actions.plot>0
 %         subplot(1,3,2); 
 %             pcolor(plotpic_Cnd); shading flat; colormap jet; hold on;
 %             title('Condensin');
-
-      
-            
-            
-            if 1
-        %figure(165); 
+     
+           figure(145); 
             subplot(3,1,1); pcolor(kymo_DNA'); shading flat; colormap hot; hold on;
             plot( info_DNA.pos_frameno,info_DNA.pos_X_subpix+expinfo.channelshift, 'bo','Markersize',3); hold on;           
             ylim([0 length(kymo_DNA(1,:))]);
@@ -163,10 +167,24 @@ if actions.plot>0
             %[sh,~,~]=ginput(2); 
             %xshift=sh(2)-sh(1) %output shift
             
-            saveas(gcf,strcat(SaveName, '_kymographs_overlays.jpg'),'jpg'); 
+            saveas(gcf,strcat(PlotSaveName, '_kymographs_overlays.jpg'),'jpg'); 
+            pause(0.5); close(gcf);
+            figure(169); 
+            subplot(2,1,1); pcolor(kymo_DNA'); shading flat; colormap hot; hold on;
+            plot( info_DNA.pos_frameno,info_DNA.pos_X_subpix+expinfo.channelshift, 'bo','Markersize',3); hold on;           
+            ylim([0 length(kymo_DNA(1,:))]);
+            xlim([0 length(kymo_DNA(:,1))]);
+            subplot(2,1,2);
+            plot(info_DNA.pos_frameno,info_DNA.content_perspot_meas+info_DNA.content_perspot_res, 'ro','Markersize',2); hold on;           
+            plot(sum(kymo_DNA_peaks'),'b');
+            plot(sum(kymo_DNA_hat'), 'g-');
+            xlabel('frame');
+            ylabel('intensity, %');
+            %legend('local per peak','peak profile sum','tether sum');
+            saveas(gcf,strcat(PlotSaveName, '_content_of_peaks.jpg'),'jpg'); 
             
-            %close(gcf);
-        end
+            pause(0.5); close(gcf);dum=1;
+            
 end
 end
 
