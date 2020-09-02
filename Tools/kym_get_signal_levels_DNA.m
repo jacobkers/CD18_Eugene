@@ -1,4 +1,4 @@
-function fluo=kym_get_signal_levels(kymo,init); 
+function [fluo,kymo_hat,kymo_peak]=kym_get_signal_levels_DNA(kymo,init); 
      sigmas=init.tresholdsigmas;
      wdw=3*ceil(init.psf_est); % 'uncorrelated distance
      psf_int=ceil(init.psf_est);
@@ -31,7 +31,10 @@ function fluo=kym_get_signal_levels(kymo,init);
         
         %% tether properties
         %define final profile; assume single static main peak there
-        final_profile=(nanmean(kymo(:,end-100:end),2))';
+        hatlength=50;
+        final_profile=(nanmean(kymo(:,end-hatlength:end),2))';
+        final_profile=smooth(final_profile',3,'moving');
+        final_profile=final_profile';
         [left,right,~]=prf_find_profile_edges(final_profile, 'tether');
         if right-left<5*psf_int  %not good
             left=1+psf_int; right=length(final_profile)-psf_int;
@@ -100,4 +103,6 @@ function fluo=kym_get_signal_levels(kymo,init);
     fluo.level_MD_treshold=thr;
     fluo.level_MD_SR_ratio=SR_ratio;
     
+    kymo_hat=kymo_hat';
+    kymo_peak=kymo_peak';
    dum=1;

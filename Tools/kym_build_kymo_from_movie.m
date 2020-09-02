@@ -8,6 +8,14 @@ function kymo=kym_build_kymo_from_movie(pth,expinfo)
     Y=expinfo.endpoints_xy(:,2);
     driftx=expinfo.driftxy(1); 
     drifty=expinfo.driftxy(2);
+    if isfield(expinfo, 'pad_it');
+        pad_it=expinfo.pad_it;
+    else
+        pad_it=0;
+    end
+    if pad_it
+         padL=10;  Y(2)=Y(2)+2*padL;
+    end
     hf=ceil(expinfo.kymowidth/2);
         
     cd(pth); fs=dir('*.tif*'); cd(codepth);
@@ -34,16 +42,31 @@ function kymo=kym_build_kymo_from_movie(pth,expinfo)
          case 'stack'      
              pic=double(imread(strcat(pth,'\',filname1),'Index',idx));
         end      
+        
+        %add optional padding here.....
+        if pad_it
+            %[outpic,thr,SR_ratio]=matrix_find_treshold_MD2020(pic,0);
+            noiz=std(pic(:));
+            av=median(pic(:));
+            padblock=av+noiz*randn(padL,cc);
+            pic=[padblock ; pic; padblock];
+            [rr,cc]=size(pic);
+            %get noise       
+        end
+        
         %drift-corrected sampling
         Xi=X+driftx*idx/FramesNo;
         Yi=Y+drifty*idx/FramesNo;
+        
         prf=xy_get_wide_intensityprofile(pic,Xi,Yi,hf);        
         if idx==1
             kymo=zeros(FramesNo,length(prf));
             [~,Wk]=size(kymo);
-        end        
+        end     
+        
         prf=prf_remove_sloped_background(prf);          
         lp=min(Wk,length(prf));% avoid rounding effects       
         kymo(idx,1:lp)=prf(1:lp); 
      end
+     dum=1;
      
