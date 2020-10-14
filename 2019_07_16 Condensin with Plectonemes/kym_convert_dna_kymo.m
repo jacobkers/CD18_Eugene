@@ -17,7 +17,7 @@ function kymo_1=kym_convert_dna_kymo(kymo_DNA,levels_DNA);
 %     level_tethertreshold: 6.1945
 %     level_looptreshold: 7.7190
 
-kymo_1=kymo_DNA-levels_DNA.level_darktreshold;
+kymo_1=kymo_DNA-levels_DNA.level.darktreshold;
 kymo_1(kymo_1<0)=0;
 [rr,cc]=size(kymo_1);
 for ii=1:rr

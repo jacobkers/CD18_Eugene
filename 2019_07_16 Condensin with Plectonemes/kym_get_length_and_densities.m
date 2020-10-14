@@ -23,11 +23,13 @@ function [info_DNA,info_Cnd]=kym_get_length_and_densities(info_DNA,info_Cnd,kymo
    end
    
    %% add some classification for the condensin
-   isawayfromDNAedges=(info_Cnd.pos_X_pix>curvestart)&...
-                      (info_Cnd.pos_X_pix<curvestop);
+   isCnd_awayfromDNAedges=(info_Cnd.pos_X_pix>curvestart+3)&...
+                      (info_Cnd.pos_X_pix<curvestop-3);
+   isPlec_awayfromDNAedges=(info_DNA.pos_X_pix>curvestart+3)&...
+                      (info_DNA.pos_X_pix<curvestop-3);
                   
-   info_Cnd.classify.awayfromDNAedges=isawayfromDNAedges;
-   
+   info_Cnd.classify.awayfromDNAedges=isCnd_awayfromDNAedges;
+   info_DNA.classify.awayfromDNAedges=isPlec_awayfromDNAedges;
    
    
    %% get general numbers  for this kymograph
@@ -42,6 +44,11 @@ function [info_DNA,info_Cnd]=kym_get_length_and_densities(info_DNA,info_Cnd,kymo
              (info_Cnd.pos_X_pix>curvestart+3)&...
              (info_Cnd.pos_X_pix<curvestop-3)));
     
-    info_Cnd.general_freedensity=info_Cnd.general_free_number/...
+     if ~isempty(info_Cnd.general_total_freetetherlength)    
+            info_Cnd.general_freedensity=info_Cnd.general_free_number/...
                              info_Cnd.general_total_freetetherlength;
+     else
+         info_Cnd.general_freedensity=0;
+         info_Cnd.general_total_freetetherlength=0;
+     end
     dum=1;

@@ -27,13 +27,16 @@ if override_userpaths_to_sharedpaths
 end
         
 %% main shell
-if 0 
+if 1 
     actions.buildkymographs=0;  %make raw kymographs
     actions.peakdetection=0;    %detect peaks; convert to genomic percentage and condensin counts
+    actions.smallpostprocessing=0; %some classification (edges)
+    actions.plot=0;   %plectoneme/condensin relations etc
     A020_Condensin_and_plectonemes_get_kymographs_and_positions(init,expi,usr,actions);
 end
-if 1, A025_content_plots(init,expi,usr); end
-if 0, A030_Condensin_and_plectonemes_process_positions(init,expi,usr) ; end
-if 0, A040_Condensin_and_plectonemes_follow_up_process(init,expi,usr) ; end
+
+if 0, A030_Condensin_and_plectonemes_harvest_all_rois(init,expi,usr) ; end
+if 1, A040_Condensin_and_plectonemes_follow_up_process(init,expi,usr) ; end
+if 0, A050_Condensin_and_plectonemes_content_analysis(init,expi,usr); end
 clear all;
 

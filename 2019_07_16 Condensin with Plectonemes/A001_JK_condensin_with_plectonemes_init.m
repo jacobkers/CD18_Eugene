@@ -12,6 +12,9 @@ function init=A001_JK_condensin_with_plectonemes_init(expi);
 %References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
 %:JWJK_A-----[add ABCorC*---------------------------------------------------
 
+shuffle_rois=0; %to avoid 'training' the analysis on one roi..
+
+
 switch 1
     case 1
     %local paths
@@ -68,8 +71,13 @@ switch expi
         init.expname='WT_condensin_42kb_non_nicking\';  %directory name                   
         init.AllExp=[1:21];        %numbers of various rois
         %init.AllExp=[1 4 6 7 12 14 15 16 19 20 21];        %numbers of various rois
-        init.AllExp=[1:41];        %numbers of various rois
+        init.AllExp=[1:41];        %numbers of various rois        
         init.roidirname='ROI';
+end
+
+if shuffle_rois
+       [vals,shuffle_idx]=sort(rand(1,length(init.AllExp)));
+        init.AllExp=init.AllExp(shuffle_idx);  %randomize order
 end
 
 init.psf_est=2.7; 
