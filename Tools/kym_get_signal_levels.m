@@ -48,7 +48,7 @@ function fluo=kym_get_signal_levels(kymo,init);
         kymo_hat=0*kymo; 
         content_tether=[]; content_residu=[];
         for ii=1:cc  %for all profiles
-         [prf_hat,prf_residu,fract_hat,fract_res]=prf_fit_hat( kymo(:,ii)',hat,fluo); 
+         [prf_hat,prf_residu,fract_hat,fract_res]=prf_fit_hat( kymo(:,ii)',hat,fluo,init,0,'push'); 
          content_tether(ii)=100*fract_hat;
          content_residu(ii)=100*fract_res;
          kymo_hat(:,ii)=prf_hat';         

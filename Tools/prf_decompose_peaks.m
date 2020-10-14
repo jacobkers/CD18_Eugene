@@ -3,7 +3,7 @@ function [peakprops,buildcurve]=prf_decompose_peaks(PeaksCurve,Psf,showit)
 %is reached. JacobKers 2016
 %[count PeakVal Xpos  Psf ThisSpotFraction CoveredFraction RelChange]]; 
 MaxPeakNo=10;           
-StopRelChange=0.1;     %0.01 means 1% of change in covered fraction
+StopRelChange=0.02;     %0.01 means 1% of change in covered fraction
 ChipIt=1;            %This is the fraction of the local maximum that ...                        %is used to build the gauss to be subtracted
 
 if nargin<2                %This sets the width of Gaussians to peel off   
