@@ -1,8 +1,6 @@
 # BN_CD18_EK_CondensinTrack
 
-Matlab code to analyze condensin data
-
-This software was custom written for data analysis associated with 
+Matlab code to analyze condensin data associated with 
 “DNA-loop extruding condensin complexes can traverse one another” by Kim et al, accepted to Nature ; 2019  
 
 Interested users are expected to be comfortable with MATLAB programming and able to understand code and adjust independently for own use. 
