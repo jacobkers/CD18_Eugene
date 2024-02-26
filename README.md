@@ -13,4 +13,4 @@ Code is not designed for general use and minor bugs may still be present. Intere
 
 For some work, an earlier repository may exist that was referenced in the publication. This is noted in the corresponding README.
 
-Jacob Kerssemakers
+Jacob Kerssemakers 2024
