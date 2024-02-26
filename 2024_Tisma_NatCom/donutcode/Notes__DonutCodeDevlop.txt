@@ -1,0 +1,366 @@
+18-11_2020 sent to github
+synching; added code_description file
+
+
+28-4-20 sent to github
+Revisited donut code, working now from github version.
+Moved old initval to data-out directories, cleaned all but 'versiontest'
+
+
+23-4-19
+-cleaning paths in setup : now I work with 'Data-in, 'data-out' and 'project'. Works on 'versiontest'
+-copying core functions for sharing: spaghetti, cluster analysis; cleaning & commenting
+
+30-1 sent to Github
+-results are now written to project dir, not to data(for more regular backups)
+-reorganized A050: cluster analysis: first analyze, then plot
+-added quality check: '_A050_ClusterGeneralprops.mat' stores now number of clusters and total squared off-percentage
+
+
+23-1/24-1 sent to Github. 
+-corrected single-branch flipping
+
+rebuttal run notes
+1-case 6(main), 9(left-right) and 10(ori-right) re-run at 100 
+	-all 3 single-branch 100 cells, with flipping
+	:flipping seems not working well for left-right
+	:ori-right very few cells left (10%) due to lack of donut
+2: re run fullsets,single-branch,no flipping&flipping (6 runs)
+	-found incorrect fliptype LR&OR; rerun
+3: single branch does not allow flipping?
+	-A20/C015(single-branch): bug in line 10 (wrong index); added demoplot
+	note: the flipping procedure uses the global minimum. 	This works fine for the symetric cases (ori-ter and left-	right) but is somewhat less suitable for ori-right (where 	the small distance -angular, genomic- is more apropriate.
+	-checked C010 (2branch). OK: This one just uses in which branch the minimum lies, no particualr index location of the minimum. 
+
+
+
+
+17-1/22-1 sent to github:
+Combined with full-stack save option in 'Crop code': 
+added option in A010 'actions.workfullstackdiagnosis': JK_diagnosis_GetVerticalInfo. Collects 3D info per cell ; applied to dataset 106: '2016_11_23_2179_Wildtype_Zcheck'; data saved to: D:\jkerssemakers\_Recent\CD\BN_CD16_Sandro\Paper2018\Rebuttal 2\On 3D aspect; then option set off, code back to default.
+
+
+
+
+
+16-1 works
+A10 line 165 and elsewhere: keep chromosome stack, build function to asses vertical structure, later to evaluate
+
+
+27-6 sent to Github
+in A050: PeelblobsFromImage: enforced a post-peeling normalization sucht that all spot fractions add up to 1; later rejection steps may still lower this number.
+
+
+27-6 sent to Github
+A10: added saving of counts (cromosome, rfp, cfp) to basic cell geometries. Includes addition of tool: 	Processing_Fluorescence_SimplePatternAnalysis
+
+13-4 sent to Github
+Build option to read config from matlabfile: 
+A0001_WF_ComfigPerExperiment; 
+optionally replaces excel. works; to be expanded
+earlier: some name bugs
+
+
+
+4-4: sent to Github
+rejection list could also be text; 	
+- A0000/A015: 
+	- updated 'Exp overview'
+	- transfer 'versiontest' to Sandro Dir
+	- re-run 'versiontest' (batchrun 1)
+	- added function in A15=GetRejectedCellNumbers
+	- rejection by user overrulles 'pass all cells' now
+	- added extra label to name of overview excel 
+		'ExperimentOverview_JacobSandroDataTestRuns'
+	-test runs: [1 104 105]; (all 'A's')
+	'VersionTest'; '2767-HU' ; 'MatPnew'
+	(rejection text, no rejection, rejection excel)
+
+
+
+
+19-3: sent to Github
+
+	-run shell on sandros's D:\jkerssemakers\_Data\CD\2016_Sandro\2018_03_NAPdata' w/o errors
+		A10,A15 minor fixes
+		A20 C25, C35 needed some repair on matrix handling
+		testing for sandro 101-104; runs up to A050
+		added suffix to Exp_overview excel file name
+
+
+28-2 	sent to Github
+	A020 continued, removed bug, genral props array now works
+	A030 changing 'chromosome content' such that any property is processed, with saving changed per label 'whatspaghetti'
+	A030 added 'LocalContent' , 'LocalWidth' and 'LocalPeakvalue'
+works!
+	
+
+
+21-2 A020 edits to pass widths and possible other properties through alignment steps
+	Aligned=EQUIANGLE_ORI_OrganizeBranchOrder: 
+		-added GeneralPropertyArray: rows: content, FWHM, ridgelineradius,peakvalue
+	Aligned=EQUIDIST_ResampleAlongRidge
+		-made C025 compatible with both curve and array
+		-added extra call C025 working a GeneralPropertyArray
+	Aligned=EQUIBASEPAIR_ResampleAlongRidge(Aligned,initval);
+		-made C035 compatible with both curve and array
+		-added extra call C035 working a GeneralPropertyArray
+
+
+
+
+13-2
+Started  version (from A030) to plot 'width' spaghetti curves; still based on content 
+width still needs to be passed trough all alignment steps (orig,dist, BP) in A20; now only content'is passed.
+Consider expanding ''content'' to property arrays in C025, C035 ; might add an alignedmatrix to sequence
+Consider keeping A30 and make it optional for any property; including naming of files; make content leading
+
+23-1
+worked on
+A013_WF_PerCell_AnalyzeSpotsStandAlone (new)
+A055_WF_2DClusterAnalysis_Standalone
+...and subfunctions. A013 identiefies one or more spots per color channel
+
+
+22-1-2018
+Made a standalone 'A055' clusteranalysis (no need for prior donut analysis run)
+
+
+8-1-2018
+Started setting up 'A0001_WF_SettingsPerExperiment' to replace Excel import
+
+Revisit ridge line work:
+	A010: function Chromosome=ChromosomeRadialSampling_WideField(im,QI, sho);
+	line 183: ldropofflengthIn=ceil(cc*dropofffractionIn); reoved factor two;  effect is that ridge line is much more 'pushed out
+	tested on cell 20020, option 61 
+Cluster analysis cosmetics: close contour lines
+	A050_WF_2DClusterAnalysis; line 438 and lower; function GetClusterShapeProps line 530
+	
+
+
+
+
+sent to github
+19-12
+A010: function Chromosome=ChromosomeRadialSampling_WideField(im,QI, sho);
+line 103:  StetsonMask=BuildStetsonMask(cc,rr,0.1); changed this section such that masking is amplitude dependent so 
+that gaps don't curl inward while still crossing clusters. Works okish
+
+
+sent to github
+18-12
+Note: Alignment over ter gap suffers somewhat from the more meandering 'ridgeline' when we forced it to cross the clusters.
+(see below, on 'StetsonMask=BuildStetsonMask(cc,rr,0.1)'. Put mask softening to 0.2 to see the result 
+Therefore, 
+
+
+
+2-branch alignment:
+A20: added force-passing 'all cells' also to 2-branch alignment to make all frames pass for proxi-maps. 
+	This is done in function C035, line 18: if ((CorFactor>1.5)|(CorFactor<0.6))&(~initval.PassAllCells);
+However I noted that underlying reason reason for rejection of some image alignment is because of poor cfp spot tracking! Therefore checked: 
+A10: spot tracking found to use  poorly masked images which offsets ter pos for example sim 100002_t05
+Action: changed around 130:
+ 	Cfp_pic=Cfp_pic-median(Cfp_pic(:));    
+    	Cfp_pic=Cfp_pic.*cellmask;
+...and similar for Rfp
+
+
+
+ridge line:
+A010: masking sharper angles so that ridge line stays closer to max clusters
+A010: function Chromosome=ChromosomeRadialSampling_WideField(im,QI, sho);
+line 103:  StetsonMask=BuildStetsonMask(cc,rr,0.1); for demo %was 0.5 which is better for 
+'smoother' loops when max crossing is not super relevant (such as for density curves)
+
+handling:
+A050: added 'demo'option' for doing single cell
+
+
+sent to Github
+15-12
+A080: 
+	added test options to show derivative distance maps
+        replaced selection of density curve to correct one
+	aligned sim contact maps now ok
+
+
+sent to github
+5-12
+small changes to BuildNumericCellLabel to handle results from 'cropcode' on repli data 
+works for both naming formats
+
+27-11
+Building alignment based on averaged label positions
+-spit off 'get spotprops' from A010
+added B010 to A020 : see if data  is movie, if so determine average RFP spot via averaged image
+checked 'YFP leakage correct' option in 'Getspotprops
+workflow ok  but to be adapted (avaraging gives strange label positions
+
+note: spottracking A010 suboptimal
+
+
+
+
+15-11
+A050: 
+	save Cluster properties per cell to result mat for later use
+	extend these cluster properties
+A085: load cluster props for 'domain maps' maps
+
+
+
+
+sent to github
+14-11
+Updated Contact maps SIM:
+-export non-tresholded tif files and plts in separate dirs
+-resolved NaN-incomplete padding bug in distance curve back into A010
+(was leading to incomplete contact maps): via new: 'Do_Periodic_Padding'
+
+
+
+sent to github
+24-10
+A050: added option to measure psf instead of using set psf (B050)
+Added column 'used psf' to A050 output
+corrected: exclude zeros from calculating averages in table
+B050: include amplitude criterion for slope-peak distance
+some small patches
+
+
+sent to github
+17/18-10
+Worked on radius (diameter) of clusters: see '20171018_On radius of gyration.doc'
+extra save table with all cluster props in single columns
+made 'A200' program for quick reading stuff
+
+
+
+3-10
+Expanded Annotations: 
+Rewrite 'ManualGenerator' to output comments in hierarchical way ('A-B-C comments'); 
+added annotations to 'A' programs; to be expanded.
+
+
+
+sent to github
+
+20-9 continued
+
+-made settings: psf 2.7 instead of 2.9 for all; cluster analysis needed that (did bckground correction over-shrink blobs?) seems 2.5 would be better, to discuss
+-A10: solved mask name issue 
+(sim/widefield); now to be set in excel table; both  batchrun1 and 2 same format 
+-running 6 and up one by one, A10-A50; adding column 'RawNo' to excel for estimate of analysis time
+-running '6',BN2179main, as test, A10-A40 (skipping blobs). crash: ma_200046.mat is missing: incomplete unzipping? redid unzip; rerun
+
+
+sent to github
+20-9
+-added new exp cases to initval; condensed lines
+-full A10-A90 test run; ok A10-A50, 1300secs for ~90 cells
+-added alignmodus to result dir name
+-test run: A50 remove cluster spaghetti curve; repair code; works on 'test'
+-added alignmodus, flipcells, passallcells to overview table
+-reorganized data directories; 
+	removed 'ori' subdir,location tables
+	some debugging pathnames
+-received & extracted fabai data, 15 sets
+
+
+
+19-9
+-no-content locations now get FWHM=NaN to exclude gaps from width measurements
+-building relative time correlation:
+A095_WF_SIMCorrelationDensity_Relativetime:
+-every cell, every frame is correlated with any equal or later frame
+-(30 cells, 20 frames take (30x20)^2 /2 =1.8*10^5 repeats! About a minute/cell, 30 mins.
+
+-tried spaghetti 'spike' curves via 2D clusters; less intuitive we think.
+
+
+3-9
+some crashes while running content-based axes. replaced NaN by 0 for low content
+re-adjusted pinindex in alignment -solved
+now crash in A40; -solved
+still weird graph panel 4 -solved
+now alignment of marker is in BP plot is off again..-solved
+cod eruns standard datasets now
+
+
+28-8/29-8
+added radius of gyration to basic properties; test on 'versiontest'
+running new bg si data -had to solve interp bug 
+solved cluster analysis bug (A050) crash when no cluster found
+changed density curve : instead of PEAK values per radial section, 
+go back to CONTENT per radial section since this gives larger range
+
+
+23-8 send to github
+batch run multiple exps	All progs; To quickly apply prog changes to data output [Fabai]
+
+standardized data dirs names per exp, collect to one result dir
+made export dir names specific per exp
+Add 'bad alignment' handling	A20/A30 [Fabai]
+add ter pos/val to output gap/peak analysis	[Fabai]
+
+9-8
+Excel:Clean up unused excel fields (saving type)
+A015/A001/Excel: screen now for minimal angle of rfp-cfp 
+A015,A30,A40: graph cosmetics: add exp name
+A020/A30: flipmarkers added (at 90 degrees CW from ori,works for 1 and 2-branch
+A030: Extra Panel Savings
+
+
+8-8 sent to github
+saving of summaryplots
+A90 (sim) organized savings of correlation curves; 
+added program names to output files('A040' etc)
+tested on: versiontest,ori-right,old simdata,new simdata
+
+
+7-8 continued
+made ter-ori-angle criterion general; now based on minimal angle to be expected 
+(to prepare for other strains). Test on ori-right, works
+
+7-8 to Git
+A90: works for 'Sim'
+A40: works for 'test' and 'Sim'
+A30 works for 'test' and 'Sim'
+A20 works for 'test' and 'Sim'
+added markerposses to kymograph, ok for 2-branch
+
+
+2-8
+Removed outer contour alignment options (B20 1 and 2,B25)
+
+A20 re-organization since it was unclear
+Moved B030 to A20 since it is only used there
+split steps in: 
+ORIG: shuffling of indices, branch order; get absolute and relative marker location
+DIST: re-sample parameters along distance axis over ridge
+	(use data from 'ori' fields)
+BP: re-re-sample parameters along content over ridge
+	(use data from 'dist' fields)
+
+Marker properties are saved with:
+orig: (original angle, index, distance (abs/%) from ori, BP perc% from ori
+BP: BP perc% from ori, to double check correction
+
+
+
+
+
+1-8
+-A090: re-organized such that it will recognise frames belong to one cell
+
+-A015: to account for sim and strain-specific screening settings, 
+       move screen params to exp overview excel
+
+
+
+
+
+
+
+

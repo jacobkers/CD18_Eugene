@@ -1,0 +1,131 @@
+nov 21
+	A040: added possibility to select range of minima or maxima strength
+
+
+
+nov 15
+	A40 extend axis histograms 
+	A40 create ori (or ter) based local plot w/BP axis
+	A30/A40 better names
+
+
+
+nov 8
+A030 added colored spaghetti curves Fig1B
+A040 
+	added CellOkay selection
+	removed  inactive '1D peak peel section' around line 53
+	link minima to genomic pos
+	added extendedaxis to full-span scatterplots; for that refined F008, adapted A030 
+
+
+
+
+nov 7/8
+
+A015: CellOkaying: 
+	Added 'screening summary' to A015
+	get measure for ring intensity from pic
+A020 and 
+A030, to do 
+		use cell okaying for follow-up tools-------ok, worked cellscreening in A020 and A030, to do A040
+	
+A030 then, work Fabai fig 2 graphs
+	A030: add padding % on distance/BP density graph----ok
+	A030: add 'ProduceFig1Aplot'   function (basic density curve plus padding)
+	A030: add 'ProduceFig1Bplot' function ('spaghetticurves')
+
+Others: 
+a) A020/B020/25: added flipping to single branch function C015, verified flipping occurs in ~50%
+b) re-activated contour analysis via distance along maxima of chromosome. 
+	This works with proper pre-screening as in A015
+
+
+issue: we do minima analysis based on distance axis,   but would like these to plot against genomic distance from ori and ter. 
+How to proceed?
+idea: re-build BP axis as in A080--> link every position to an BP axis value; then, add these to every max or min entry
+
+
+
+
+
+
+
+
+
+
+
+oct 12
+bundle width!!
+write description
+kymographs dynamics
+
+
+
+
+sep 26
+store bundle width
+build local density axis based on annulii and circular crosssections
+carefully check re-interpolation of this!
+
+Per-curve tool:
+spreading percentage around minima
+
+prep code for movie analysis
+
+
+sep 12
+-make orientation flipping optional (default off)
+-make two-point mapping to genomic/distance pos optional
+-calculate per individual curve: genomic percentage, distance percentage
+-final presentations: 	
+	ori-ori ('less assumptions')
+	ter-ter
+
+
+
+
+april 25 on splitting branches
+axis: measure outer contour length along angular axis (that sets order) via cartesian coordinates, 
+starting point is contour point closest to  ori point
+stopping point same with ter
+
+then, align/stretch  thes contour length axes between ori and ter
+(repro 6,3E)
+finally, try axis swap based on local ter site content slope
+
+
+
+
+
+
+
+
+april 5 fabai:
+We talked today, the main plots will be the plots of the minimum distance of the cell wall to chromosome. Average + standard deviation. 
+I’d still like to see kymographs of a chromosome stretched out and see how densities shift. Perhaps you can play around a little and see what looks good?
+
+The rest, I’d like to think it over the talk to you again on Monday.
+
+done 29-3
+adjusted loading by labels new dataset;
+removed various bugs
+skipped drift
+
+some instabilities in yfp analysis remain...
+
+
+march 21 Meeting Cees, Nika, Fabai, Xuan, Me
+
+-improve contour max line!
+-pad gaps w/ NaN
+-time average
+-align with ori
+-parameters: length along maximum
+-density bp/rad
+
+
+
+
+
+
