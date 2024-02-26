@@ -1,0 +1,292 @@
+Version : September_09_2019_13_34
+__________________________________________________________
+Order of listing:
+main programs: project-specific shell programs
+secondary programs are project-specific sub-programs
+tools are small sub-functions
+_________________________________________________________
+       
+ 
+Function list:
+ 
+main analysis
+________________
+A000__how_to_run_Condensin_with_plectonemes_code
+A000_condensin_with_plectonemes_main
+A001_condensin_with_plectonemes_init
+A002_Condensin_with_plectonemes_expinfo
+ 
+sub analysis
+________________
+spots00_harvest_all_rois
+ 
+tools
+________________
+kym_convert_dna_kymo
+kym_get_length_and_densities
+spots0_cleanup_spots
+spots1_associate_labels
+ 
+favorite tools
+________________
+ 
+Full description:
+ 
+main analysis
+________________
+Name: A000__how_to_run_Condensin_with_plectonemes_code
+Parameters in: no input
+Parameters out: no output
+main analysis
+Title: quicksheet to run these programs
+    1) Data: store data per movie as follows: 
+    [main path]/[project name]\[M or ROI][ROI number]\[Condensin or
+    DNA]\\moviename.tif. Example: 
+    [main path]/2019_09_02 NumberOfCondensinPerDNA\M1\DNA\181207_171109-1.tif
+    Thus, there should be a condensin and a DNA movie.
+    
+    2) Code: Download the directory '2019_07_16 Condensin with Plectonemes' and the
+    directory 'Tools' from
+    https://github.com/jacobkers/BN_CD18_EK_CondensinTrack. Unpack them next
+    to each other in a [codepath] of your liking.
+    
+    
+    3)  Open 'A001_condensin_with_plectonemes'; 
+    -inspect the general path names (line 16-19) and change them according to your above code and data paths
+    -inspect the per-experiment names (line 25-35) and add your new experiemnt in similar fashion. 
+    
+    4) Open 'A002_Condensin_with_plectonemes_expinfo'; here, extra information
+    per experiment and per roi is added; these you can obtain by opening the movie 
+    in Fiji/ImageJ. For example, experiment '1', roi '1' should have:
+             expinfo.endpoints_xy=[18 10 ; 15 65]; in image x1 y1 x2 y2   
+             expinfo.driftxy=[-2 0]; deltax, deltay between startframe and endframe
+             expinfo.kymowidth=8; adjust with neighbours nearby
+             expinfo.channelshift=0.6022; manually per ROI.... 
+            
+    5) Now, the main programs are ready to run. Open the shell program 
+    A000_condensin_with_plectonemes_main. Set your experiment number to run (top lines).
+    Open A20 and make sure all 'actions' (line 19-21) are set to 1 in a first run.
+    For repeat runs, you skip the time consuming parts by setting these to 0.
+    Now, set A20 and A30 in the shell program ('if 1') and run it.
+    data is stored in the specified output directory, using analogous names
+    
+    
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+A000__how_to_run_Condensin_with_plectonemes_code
+
+Source code:A000__how_to_run_Condensin_with_plectonemes_code line:2
+__________________________________________________________ 
+ 
+Name: A000_condensin_with_plectonemes_main
+Parameters in: no input
+Parameters out: no output
+main analysis
+Title: condensin_with_plectonemes : shell program
+Summary: This stub runs the various analyses in order of need.
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+A000_condensin_with_plectonemes_main
+
+Source code:A000_condensin_with_plectonemes_main line:2
+__________________________________________________________ 
+ 
+Name: A001_condensin_with_plectonemes_init
+Parameters in: expi
+Parameters out:  init
+main analysis
+Title: 2019_07_16 Condensin with Plectonemes; info & settings for all
+experiments. Add new experiments here following the existing format.
+Summary: These programs (A001, A020, A030) process fluorescence images of
+condensin and tethered, plectonemic DNA. First, positions and drift of
+single-tether movies should be collected using Fiji/ ImageJ. Then,
+Kymographs are made and analyzed (A020) and analyzed (A030)
+for plectoneme and condensin positions.
+Input: single-tether roi movies
+Output: spot data of condnesin and plectonemes
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+A001_condensin_with_plectonemes_init
+
+Source code:A001_condensin_with_plectonemes_init line:2
+__________________________________________________________ 
+ 
+Name: A002_Condensin_with_plectonemes_expinfo
+Parameters in: expi,roi
+Parameters out:  expinfo
+main analysis
+Title: Settings per experiment. 
+Summary: Use imageJ to get these numbers settings for all
+files. the number ''expinfo.channelshift'' is to be gotten from the
+apparent position shift in condnesin and plectoneme kymographs
+Input: index of experiment
+Output: 
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+A002_Condensin_with_plectonemes_expinfo
+
+Source code:A002_Condensin_with_plectonemes_expinfo line:2
+__________________________________________________________ 
+ 
+Name: 
+Parameters in: init,expi
+Parameters out: no output
+main analysis
+Summary: This function builds kymographs from images 
+and analyzes them for peaks associated with DNA plectonemes and condensin
+JacobKers2019
+Approach: kymographs are made from movie stacks; peak detection is 
+performed; the positions of these peaks (condnesin and plectonemes) are
+related to each other
+run actions can be set or unset, to save time.
+Input: exp info and movie stacks.
+Output: kymographs and spot information
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+  1×0 empty <a href="matlab:helpPopup char" style="font-weight:bold">char</a> array
+
+Source code: line:2
+__________________________________________________________ 
+ 
+Name: 
+Parameters in: init,expi
+Parameters out: no output
+main analysis
+Summary: This function analyzes spots positions associated with 
+DNA plectonemes and condensin
+Approach: the positions of condensin and plectonemes are
+related to each other; peaks are counted.
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+  1×0 empty <a href="matlab:helpPopup char" style="font-weight:bold">char</a> array
+
+Source code: line:2
+__________________________________________________________ 
+ 
+ 
+sub analysis
+________________
+Name: spots00_harvest_all_rois
+Parameters in: expi,init,AllExp,outpath
+Parameters out: info_Cnd_allROIs,info_DNA_allROIs
+sub analysis
+Title: Gather all info of different tethers
+Summary: Collect all spot position ans content data from all chosen rois, 
+to make histograms etc.
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+spots00_harvest_all_rois
+
+Source code:spots00_harvest_all_rois line:2
+__________________________________________________________ 
+ 
+Name: 
+Parameters in: info_DNA,info_Cnd,kymo_DNA,kymo_Cnd,SaveName
+Parameters out: no output
+sub analysis
+Title: count plectonemes. 
+Summary: count the number of plectonemes per frame; allow for averaging
+over a 'span'
+Output: plot
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+  1×0 empty <a href="matlab:helpPopup char" style="font-weight:bold">char</a> array
+
+Source code: line:2
+__________________________________________________________ 
+ 
+ 
+tools
+________________
+Name: kym_convert_dna_kymo
+Parameters in: kymo_DNA,levels_DNA
+Parameters out:  kymo_1
+tools
+Title: convert fluorescene kymograph to genomic percentage. 
+Summary: Simple normalization routine, counting all fluorescence counts
+above a certain noise treshold. All counts define 100 genome content.
+Input: kymograph.
+Output: normalized kymograph.
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+kym_convert_dna_kymo
+
+Source code:kym_convert_dna_kymo line:2
+__________________________________________________________ 
+ 
+Name: kym_get_length_and_densities
+Parameters in: info_DNA,info_Cnd,kymo_DNA
+Parameters out: info_DNA,info_Cnd
+tools
+Title: get condnesin density per tether length
+Summary: This function analyzes the density associated with 
+DNA plectonemes and condensin
+Approach: 
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+kym_get_length_and_densities
+
+Source code:kym_get_length_and_densities line:2
+__________________________________________________________ 
+ 
+Name: spots0_cleanup_spots
+Parameters in: info_1
+Parameters out:  info_1
+tools
+Title: clean spot data from outliers
+Summary: remove spots that are outside a specified range
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+spots0_cleanup_spots
+
+Source code:spots0_cleanup_spots line:2
+__________________________________________________________ 
+ 
+Name: spots1_associate_labels
+Parameters in: info_1,info_2,psf_est,corr
+Parameters out:  info_1
+tools
+Title: link condensin positions to DNA plectoneme positions -or not
+Output: a flag indicating of the particular spot is associated
+(co-localized) with a pot in the other channel.
+References: CD lab, project Eugene Kim, written by Jacob Kers, 2019
+
+sourcename =
+
+spots1_associate_labels
+
+Source code:spots1_associate_labels line:2
+__________________________________________________________ 
+ 
+ 
+favorite tools
+________________
+ 
+Matlab code associated with project:C:\Users\jkerssemakers\Dropbox\CD_recent\BN_CD18_Eugene\Matlab\2019_07_16 Condensin with Plectonemes\
+number of characters:134124
+number of code lines:3008
+number of functions:48
+number of comment matches:12
+__________________________________________________________

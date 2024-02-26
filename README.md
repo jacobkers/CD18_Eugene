@@ -1,11 +1,16 @@
-# BN_CD18_EK_CondensinTrack
+# publication-associated code
+by J.W.J. Kerssemakers
+Cees Dekker Lab
 
-Matlab code to analyze condensin data associated with 
-“DNA-loop extruding condensin complexes can traverse one another” by Kim et al, accepted to Nature ; 2019  
+## description
+This repository contains my custom code associated with publications from the Cees Dekker lab I was involved in.
+Interested users can free use (parts of) the code. In such case, please cite the associated papers. 
+Regarding specific questions, please send these via the corresponding authors.
 
-Interested users are expected to be comfortable with MATLAB programming and able to understand code and adjust independently for own use. 
-Likewise, a basic understanding of image and signal analysis is expected. 
-While care was taken in testing, since this non-commercial code is intended for lab use,  
-we cannot guarantee it is fully bug free. Responsibility for re-use and re-editing on alternate datasets resides with the user.
+## disclaimer:
+It is understood these are custom developed code snippets to elucidate the data processing  of the associated papers.
+Code is not designed for general use and minor bugs may still be present. Interested users are expected to have a proper understanding of the code language.
 
-Jacob Kerssemakers, Cees Dekker Lab, 2019
+For some work, an earlier repository may exist that was referenced in the publication. This is noted in the corresponding README.
+
+Jacob Kerssemakers
