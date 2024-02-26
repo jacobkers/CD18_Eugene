@@ -4,7 +4,7 @@ Cees Dekker Lab
 
 ## description
 This repository contains my custom code associated with publications from the Cees Dekker lab I was involved in.
-Interested users can free use (parts of) the code. In such case, please cite the associated papers. 
+Interested users can freely use (parts of) the code. In such case, please cite the associated papers. 
 Regarding specific questions, please send these via the corresponding authors.
 
 ## disclaimer:
