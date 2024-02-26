@@ -3,6 +3,7 @@
 ## general
 * code for extended cell analysis as used in the Cees Dekker Lab, 2017-onwards
 * git development [non-public] https://github.com/jacobkers/CD20_Cells
+* git public: this repository
 * this README largely follows the guidelines as required by Nature Communications
 
 ## public sharing
