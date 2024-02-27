@@ -1,5 +1,4 @@
 # publication-associated code
-
 by Jacob W.J. Kerssemakers
 Cees Dekker Lab
 
@@ -17,10 +16,15 @@ Code is not designed for general use and minor bugs may still be present. Intere
 For some work, an earlier repository may exist that was referenced in the publication. This is noted in the corresponding README.
 Independent publication-related repositories are listed below.
 
-## references and links to co-developed code
-
+## references and links to publicly accessible (co-)developed code and data
+Github:
 * 2021_Loeff_Patterns : https://github.com/jacobkers/Loeff-Kerssemakers-et-al-AutoStepFinder
 * 2022_Meindlhumer_Front_Phys : https://github.com/M-Sabrina/MinDE_analysis_2022
+Zenodo:
+* 2024 Tisma_NatCom: https://zenodo.org/records/7733856
+* 2024_Davison_Nature: https://zenodo.org/records/7409240
+* 2021 Brauns_Natcom: https://zenodo.org/records/4637889
+* 2021_Loeff_Patterns: https://zenodo.org/records/7920072
 
 
 Jacob Kerssemakers 2024
