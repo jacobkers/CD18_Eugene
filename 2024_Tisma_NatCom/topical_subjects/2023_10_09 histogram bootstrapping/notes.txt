@@ -1,0 +1,7 @@
+oufti output files:
+4595_30min_002c1_Spotdetection (1666 cells)
+4595_180min_001c2_Spotdetection (1666 cells)
+
+code:
+histSpotsNumber, original copied from:
+M:\tnw\bn\cd\Shared\Tisma\Bacillus subtilis chromosome imaging\scripts\Matlab_scripts_kale

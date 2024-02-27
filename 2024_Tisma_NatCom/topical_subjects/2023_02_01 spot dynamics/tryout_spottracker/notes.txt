@@ -1,0 +1,43 @@
+
+this dir contains a tryout to use SpotTracker from ImageJ
+In the end, it was a lot of work for a few trace so I went to the custom Matlab approach
+Jacob August 2023
+
+
+work notes
+----------------------------
+ori data: M:\tnw\bn\cd\Shared\Tisma\Bacillus subtilis chromosome imaging\Widefield_and_deconvolution\20230428_BSG4595_dynamics
+
+ImageJ 
+pre-cook spot movies:
+open ori stack, 
+duplicate: gaussian blur 15pts
+then ori div blur to suppress bleaching effect
+blur result gauss 1.5 to suppress noise.
+saved in: CD20_Cells\topical_projects\2023_02_01 spot dynamics
+Result of BSG4595_1s_001.tiff
+
+selection steps:
+window under roi manager
+1) check with SpotTracker if it follows within a roi
+2) if so, add to rois
+3) save rois for later use:
+	- in original format
+	- via 'list' as csv
+4) track:
+	open movie and pre-cook
+	re-open rois, 
+	perform tracking with SpotTracker per roi, save
+5) duplicate crops if wished for illustration
+6) drift correction in post-processing (pick also some 'marker cells')
+7) run 'spot_dynamics.m'
+
+
+data: 
+BSG4595_1s_001-4 BF/ori (1s intervals)
+BSG4595_10s_001.nd2 - BSG4595_10s_001.nd2 (series 1+2) BF/ori (10s intervals)
+BSG4595_30s_001.nd2 - BSG4595_30s_001.nd2 (series 1)
+BF is single frame
+
+to do/done:
+app. 10 ori spots, 5 'markers' per movie

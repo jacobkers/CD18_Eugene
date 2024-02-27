@@ -1,0 +1,18 @@
+Evaluation test of cluster anallysis; Jacob Kerssemakers, feb 2019. 
+
+Top program is A000_ClusterTestShell
+This runs a simulator and the analyzer: get_clusters as a loop using various input parameters. Alternative is first to generate and save, do external deconvolution and re-load these files. Then, 'sim'settings should match the settings stored in the filenames
+
+Main functions, some run independently:
+	-TCl_201809_load_cluster_testpattern
+	-TCl_201809_build_cluster_testpattern
+	-TCl_201809_get_clusters
+
+The results is summarized by TCl_201809_process_noiseplotter
+
+
+Criterion is number clusters in-clusters/out
+
+Version control on Github: https://github.com/jacobkers/BN_CD18_SJ_TestingClustersandMore
+
+

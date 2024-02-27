@@ -1,0 +1,380 @@
+12-4 new runs A60 and A62, new collector A70, see develop notes:
+-N:\tnw\BN\CD\Shared\Sandro\MukB-MatP paper\MukB raw data\BN2820-Wildtype\Repli Code output\BN2820+42C+DAPI\A062_tresholds
+-A62: add circular ori mask on mukbef and dna
+-A70: collect results
+	first run: tresholds [NaN 0.4  0.7 0.7 0.4], full area
+	second run: same tresholds, A64 with orimasking (oriradius 8)
+	third run: tresholds [NaN 0.3  0.7 0.7 0.4]; orimaskradius=10; axislimit 6
+-added exp names to symmetry-per-cell
+-solved nan output mask
+-save config settings last run
+-re-run with: [NaN 0.3  0.7 0.7 0.4]; orimaskradius=10; axislimit 5
+
+11-4 new run A60 and A62 see notes:
+-A060: tuning tresholds : 	
+    	was initval.tresholdperchannel=[NaN 0.4  0.7 0.7 0.4] 
+	is initval.tresholdperchannel=[NaN 0.2  0.7 0.7 0.7]
+-A62: set axislimit=6;
+
+
+
+6-4 tresholding work on A60 and A62 see notes
+-A060: tuning tresholds : 
+	was initval.tresholdperchannel=[NaN 0.1  0.7 0.7 0.7]
+    	now initval.tresholdperchannel=[NaN 0.4  0.7 0.7 0.4] 
+-A62 add more diagnosis: 
+	-column: is area dna>area mukb?
+	-second sheet with summary
+	-expanding export with symmetry -by-area
+
+4-4
+-all runs except 28 work up to A60 (28: cell count difference issue) 
+-A62: 23 run issue (masks and ori pics don't match size --> 
+-solved: cells and masks repli/A60 were not matching
+
+28-3-2022
+-reviving runs, made some data search tries (doesn't work well)
+-ok: run 24.1: MukB paper (O:\CD_Data_out\2016_Sandro\2018_SJ\MukB-MatP paper\MukB raw data\BN2820-Wildtype\)
+
+
+2-3-21 Refresh run notes MukBef:
+Setup
+-start Fortisclient, 
+-start webdrive, map 'bulk' (X) and Groups (V)
+-open A062, open Init, case 24 (local) and 24.1 (remote)
+-data is saved to hardwired local repli path
+-run it via 'lazyshell'
+-case 24 (local) works
+-case 24.1 works
+
+
+
+TO DO--- nov 2020------------------------------------------------
+-	First , get MukB signal around ori profile :
+-	get profile ,get radius& average %
+-	Then we mask out the ori-related intensity and look at the rest:
+	 Raman found a twice higher than average intensity for DNA of MukB overlapping with DNA : '' MukBef compacts DNA ''
+	Now, check this non-ori related MukB signal: is it symmetric or not	
+•	Run via X en L: use Fortisclient and Webdrive
+
+18-11 githubbed
+----------------------
+aim: We should use com of the chromosome or preferable donut export export: passing  donuts, donut center
+data is here:(these paths are reachable using Fortisclient and Webdrive
+donut output: X:\tnw\BN\CD\Shared\Raman van Wee L\BatchanalysisResults
+
+
+
+issue: current paths in the code are strongly generalized, but now we need donut output paths too. Plus, we have the overrides, very different locations of donut- and repli data etc. 
+approach: We should have clear and full source paths, also for future reference. We have only a few basic paths we need: 
+	crop
+	donut
+	repli
+	excel(for the overview table, since there may be more)
+done: rewrote config file for hardwiring paths
+
+
+
+
+
+
+
+
+
+DONE---------------------------------------------------------------
+18-11-20 githubbed
+-commenting code in 'ManualMaker' format for documentation purposes, before new changes
+-synching code in github
+-transfering active coding dir to Drobbox/github; renamed repository
+
+
+
+
+12-10-2020/13-10
+A62 (new)
+	load pairs of images (specifically, chromosome and MukB),
+	build image coordinates [XX, YY]
+	load spot info (specifically, chromosome_COM [cx,cy] and ori
+	measure angle ori-com, then rotate image coords to XX', YY'
+	measure percentages positive and negative X' to evaluate symmetry
+	save the result as excel, manual fine-tuning by user to pick good donuts
+other
+to do: change config such that I can load from here:
+(start webdrive app) access: https://webdata.tudelft.nl/ 
+X:\tnw\BN\Shared\Raman\MukB_MatP data\Datasets_Raman\2820 (Wildtype, MukB-YFP)\\2019.02.04 BN2820+A22+DAPI002
+
+
+6/7-10-2020
+set up new testdata index '24': MukB-testdata-2019.02.04 BN2820+A22+DAPI002
+
+to do/done:
+issue: X020 absent, then channel order set at 4 (repli-init, line 70)
+solved: added override in 
+Config settings: if number and order of fields are specified, they are not loaded
+
+A60
+	done: added optional field initval.tresholdperchannel=[NaN 0.2 0.5 0.5 0.6];
+	MDs tresholding seems interesting too
+	done: save tresholded images
+		in: Localize_2Channels, optional save (for MukB&chro)
+
+
+
+
+22-6 Sent to Github
+A060: 
+	added used and excluded names
+	saved data now only saves results of used cells 
+	works for 'Raman1'
+
+15-6
+added a 'initval.blur_ter=20' to repli_init settings (may have to be adjusted)
+added exclusionlist in config
+made function 'CheckUserExclusion'
+
+
+
+20-5 send to github
+-addded missing tools to replicode dir
+-setting up shared drive override to be used remotely
+-testing with Sandro's settings&config -works
+
+
+
+14-4-20 Replicode
+-made user config files so code can transfer unchanged
+-re-organized calling of programs for easier user-handling
+-expanded manual
+-A060: can no also handle less-than-five chan data ('VersionTest')
+-some cosmetics
+-Test runs okay for 'VersionTest' and 'Raman1'
+
+
+
+31-7 Replipaper data-analysis:
+    -data 'Versiontest(91 cells) added, analyse ori as replisome label
+    -some naming issues had to be solved
+    --P110_cluster_replisome_I_vs_D: re-layouted
+
+
+3-7
+-P110_cluster_replisome_I_vs_D: structuring into functions
+-removed cluster-cluster distances
+-defined 2nd neighbours etc.
+
+26-6
+-Build  A061 to plot results from A060 (colocalization data)
+-In A060: separate treshold-analysis out
+
+
+22-5 
+-cleaning up A055
+-made new A060 to compare color channels; handle 4 or 5 channels plus old and new order
+
+21/22-5 sent to github
+Aim: Channel rename recognition; 5th channel handling
+Approach: After changing channel naming in crop code, plus 5th-channel option:
+Testdata: 'Raman1':
+
+Step-by-Step:
+Setup
+-A00__LazyShell: put  A005 behind others, it is not needed for non-movies
+-testdata runs ok
+-allow for channel swap: 
+		% OLD               NEW
+    		% cellc1: cfp-ter   ph/bf
+    		% cellc2: yfp-chro  same
+    		% cellc3: rfp-ori   same
+    		% cellc4: ph/bf     cfp-ter
+    		% cellc5: extra     ..._mukbef (optional)
+		Thus,  c1 and c4 are effectively swapped!
+		note:	pathinfo.newchannelnaming is saved in X020: celldata.mat
+
+		A000_Repli_Init: 
+			1) set epath 1 level higher
+			2) made function channelorder=Check_channel_order(initval,epth);
+			3) flag initval.channelorder (1 or 2)
+		A013  
+			Work_spotimage_CfpTer: adapted for channel order 
+18-4 
+1) In Replicode; A13: correct replicode position data w/cell com
+	Work_spotimage_RfpOri and Work_spotimage_CfpTer: added Add_XY_Rel2CellCenter to storage
+
+Work on: data:
+L:\CD\Shared\Nico Kerkhoven\2018.09.14-M9timelapse42degrees\controlstrainA.M9.001
+N:\tnw\BN\CD\Shared\Nico Kerkhoven\2018.09.14-M9timelapse42degrees\controlstrainA.M9.001
+2) set up replicode for this dataset
+3) export
+
+
+
+
+13-3 sent to Github
+ -P110: some layouting
+ -Minor patch in Init: added 'swap path'' function to handle different drobox and data locations
+
+7-2-2019 sent to github
+-A00: changed resultpath to replici-code specific so we can see what code was used;
+-added experiment 20
+-P110_cluster_replisome_I_vs_D:refined repli-cluster analysis on exp 20 set
+
+
+20-12
+-A055-PeelblobsFromImage: added example picture
+-Repli-init: added 'separatesigmas to column, to tune cluster splitting (fitting with smaller spots but collecting from longer range etc.)
+-P110: split clusters in ones near a replisome and one far away; plot these groups separately; improve readability export scatter data
+
+
+18-12
+-P110: 
+-added options distance per cluster to nearest replisome
+-added 3D contour plot
+-A055: 
+	-splitting analysis from plot loop
+	-contours/clusters are crude, try to refine
+
+
+12-12
+-renamed A110, A100 to same ,'P' (processing)
+
+
+6-12; 
+A013
+-screening expanded: keeps now track of mutual pairs, strong enough
+-added summary bar plot export
+A10: 
+-added rough count of cells (by area) to adjust screen parameters
+
+
+29-11
+A013 spot detection /Screen_spots
+-build 'spot screening': reject double counts, 
+-reject weak ones
+-added simulator
+
+
+28-11 sent to Github
+	A013 spot detection:
+	-switched off cfp spot analysis for replisome
+    		Get_MultiSpotProps:
+	-removed pre-cleaning of multispot
+	-remove 1 pixel-identical 'merged' entries
+	-remove weak (0.2 of max) spots afterwards
+		SpotsBy_1x2DGaussFixWidth_BackgroundBy_localROI_iterative: 
+	-played with 	settings to improve nearby spot separation
+	A055_WF_2DClusterAnalysis_Standalone
+	-switched off cfp spot analysis for replisome
+
+
+27-11 sent to github
+	Replicode
+	A100: solved small bug (save also empty cluster data)
+	%added separate plotting function for repli pairs
+
+
+22-11 Replicode
+	A100: split ori-ori-ter position analysis and pair      	analysis (to use last one for replipairs)
+
+22-11 Replicode sent to Github
+	-Overview_testruns_replidata.xlsx: added cols for 	optional ori-ter and replisome analysis
+	-A0100: re-organize for optional ori-ter function, split 	analysis and plot sections for later use
+
+21-11 Replicode
+	A013: 
+	-split off spot functions specific for rfp-ori and cfp-	ter to prepare for specific replisome label analysis
+	A00_LazyShell some renaming
+	A013, A055,A100: use one structure 'All_labels' to store 	and pass spot information
+
+20-11 Replicode
+	A000_Repli_Init: 
+	-setup exps 12,13,14; setup overview xls
+	-remove reading excel not used params
+	-cosmetics
+
+
+
+10-10 'Re-analysis of 34 SIM cells' Donut code, sent to Github
+aim: re-run SIM data for FWHM width
+setting up:
+1) data sim analysis: 
+	data transferred to 'Sandro dir': 
+	2017-09-19 FW simcellcrop3_bgsub_crop_ma1BnF 
+	2017-09-19 FW simcellcrop3_fullmask
+	(SIM movies, re-cropped by FW)
+2) added to table 'Overview_testruns_donutdata.xlsx':
+	simcellcrop3_fullmask	   
+	simcellcrop3_bgsub_crop_ma
+3) in table: set psf to 2,9 (that is WF pixels!); set pix2nm at 32,5 (full pixels is 65!) ; set  no flipping, single branch
+4) in Donutdata code: initval=A000__WF_Get_JacobPathsandExperiments(batchrunindex): add case 201, 202
+5) run A000_WF__ClickAndGo: full run up to A050 run check: case 201 ok, case 202 misses 'mask' files
+
+Cehecks: table A010_Cell_BasicGeometries
+columns
+	chrom_averageFWHM	(column N)
+	chrom_stdFWHM	(O)
+	chrom_maxFWHM	(P)
+	chrom_minFWHM     (Q)
+these are collected via: ThisCellBasicGeometry=Get_And_Save_BasicCellGeometry:
+%Cromosome FWHM
+    Chro_W_av = nanmean(Chromosome.PolarContourFWHM);
+    Chro_W_st = nanstd(Chromosome.PolarContourFWHM);
+    Chro_W_mx = nanmax(Chromosome.PolarContourFWHM);
+    Chro_W_mn = nanmin(Chromosome.PolarContourFWHM);
+function:
+-Chromosome=ChromosomeRadialSampling_WideField
+	-Chromosome=Get_ChromosomeEdges(Chromosome,QI);
+	Here Polar contours are found, these are corrected for 	the oversampling that is used the radial pattern.
+			-Get_ProfileFeatures: 
+			Here, one radial profile through the chromosome pattern is analyzed. 	
+All values are in pixel units of the fluorescent image (thus, half the regular pixel size for WF)
+The cell wall is measured from the 'mask' as obtained from the crop code; this mask has the same sized pixels as the fluorescent (SIM) data
+All polar contour data excludes 'gap' sections. Gap sections are set as follows: a radial map of the chromosome is made. 
+This map is masked to suppress intensity at low and hight raddii, thus emphasizing the 'main ridge'.
+The standard deviation of this map is taken per angle; profiles with a very shallow std (0.02*the 4*std average) are seen as gaps. 
+Angles associated with these gaps are NOT included in further contour measurements (width, average, max of the contour).
+
+FWHM is what is says, the FWHM of a radial profile, in image pixels
+
+for this SIM data: Average value for all cells (N=34), all time points (11 frames) is 9,4077477378x32,5=306 nm. 
+Per Cell: see excel: simcellcrop3_fullmask_A010_Cell_BasicGeometries_with average per cell
+
+
+26-9
+running test series 'Results_2018-05-23-2818+A22full'' with the 'Lazyshell'' pack up to cluster analysis.
+these are movies of many uncropped cells. frames may bleach, spot screening will be necessary
+done: some minor tracking bugs to get it running
+
+ 
+24-9
+correlation between two kinds of channel input:
+1) spots (ori, ter or replisome) and 2) blobs(patterns; chromosome or MUkB etc)
+-removed unused cols in excel
+
+smal fixes: 
+-emptying unused fields in excel info table (added 'x'
+tested on datasets: 
+-2017-10-18 for chro-ori-ter reference (Replicode case '12')
+
+
+24-9
+
+19-9 sent to Github
+A005 now recognizes single-and double digit times
+test run Lazyshell(11):initval.expi='2018-04-09-2816-long cells_crop' works
+
+
+4-6
+Cleaning up code; making 'how-to' text file
+
+
+24-1
+Build A010 Cell shape analysis
+
+sent to github
+24-1
+Build A001 result eraser, Build A000 Shell; cleaned up 'initval'and excel table
+
+
+23-1-2018
+Made separate 'Replicode' directory to conserve Donutcode dir; 
+including tools and settings (removed all un-use

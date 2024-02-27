@@ -1,0 +1,105 @@
+30-3 analysis transfer from old to current code, continued
+as_used_by_Raman_User_config_Sandro_nw_configfile.m -->A_User_config_Jacob.m
+case 25-->25 (Wildtype)
+case 28-->28 (DeltaMatP)
+
+
+
+
+29-3-2022 
+for MukB symmetry analysis
+------------------------
+main path: 	O:\CD_Data_out\2016_Sandro\2018_SJ\MukB-MatP paper\
+main data (crop, donut, ...): \MukB raw data
+used main code: BN_CD_CellCode-master_as_used_by_Raman\replicode_with_filtering [do not change]
+config file: 	A_User_config_Sandro_nw.m
+exp overview :  'Overview_testruns_replidata.xlsx'
+
+Raman runs: 25 
+initval.expi='2019.02.04_BN2820+A22+DAPI002';   
+epth='\2820 (Wildtype, MukB-YFP)\2019.02.04 BN2820+A22+DAPI002\'
+---> now case 24.2, including exclusion list
+see also 'other'
+
+
+Other:
+-----------------------------
+Raman analysis,  with two treshold settings:
+MukB-MatP paper\BatchResults_Repli
+
+On settings: Raman used old localizer with fixed settings: 
+1) Results_2019.02.27_BN2820+A22+DAPI_Tresholded_for_DNA_(tresholded with slope=0.25, A=0.7, B=0.1)
+2) Results_2019.02.27_BN2820+A22+DAPI_Tresholded_for_foci_(tresholded with slope=0.25, A=0.7, B=0.7)
+
+The current localizer used input settings (set in A60)
+tr_dna=initval.tresholdperchannel(2);
+tr_ori=initval.tresholdperchannel(3);
+tr_ter=initval.tresholdperchannel(4);
+tr_mukB=initval.tresholdperchannel(5);  
+current settings: 		[NaN 0.2 0.5 0.5 0.6];  for: [WF DNA;Ori Ter MukB]
+settings that copy Raman's: 	[NaN 0.1 0.7 0.7 0.7];  for: [WF DNA;Ori Ter MukB]
+slope = fixed at 0.25
+
+
+
+before 2022: 
+aim: We should use com of the chromosome or preferable donut export export: passing  donuts, donut center
+
+to do: --- nov 2020------------------------------------------------
+-	First , get MukB signal around ori profile :
+-	get profile ,get radius& average %
+-	Then we mask out the ori-related intensity and look at the rest:
+	 Raman found a twice higher than average intensity for DNA of MukB overlapping with DNA : '' MukBef compacts DNA ''
+	Now, check this non-ori related MukB signal: is it symmetric or not	
+-	Run via X en L: use Fortisclient and Webdrive
+
+
+Main source paths:
+X:\tnw\BN\Shared\Raman\MukB_MatP data\Datasets_Raman [recent, repli analysis in .\BatchResults_Repli] 
+X:\tnw\BN\CD\Shared\Raman van Wee L    [BEP, donut analysis in .\BatchanalysisResults]
+
+
+2-3-2021 description Raman--------------------------------------------------------
+I have done MukB analysis in 2 phases, first for my BEP ~2 years ago and then last summer for this publication. During the summer, the data was re-analyzed and I think I used different matlab/excel files for this than during my BEP. This second round of analysis was done with scripts from a hard-drive, so that might explain why you have trouble finding them :). Looking at the date at which the files were modified, I think I have found everything you are asking for. It copied it to:
+
+N:\tnw\BN\Shared\Raman\MukB_MatP data\Scripts
+[JK when working remote, this reads: X:\tnw\BN\Shared\Raman\MukB_MatP data]
+------------------------------------------------------------------------------------------------
+
+
+2-3-21 self-search-----------------------------------------
+
+Datasources Raman:
+change 25 to 24.1 'remote' ; same data as 24
+crop path (recent): 
+	X:\tnw\BN\Shared\Raman\MukB_MatP data\Datasets_Raman\2820 (Wildtype, MukB-YFP)\2019.02.04 BN2820+A22+DAPI002
+donut path (older): 
+	X:\tnw\BN\CD\Shared\Raman van Wee L\BatchanalysisResults\Results_BN2820_02_04B_Rfp_2Branch_Flipped (79 cells)
+	*use as checksum, find this in 'all cell images'
+	** see below: '4A' links to DAPI001 -'good images'; 4B to Dapi002
+	excelpath	
+	X:\tnw\BN\CD\Shared\Raman van Wee L\ExperimentOverview.xlsx
+repli path:
+	X:\tnw\BN\Shared\Raman\MukB_MatP data\Datasets_Raman\BatchResults_Repli\Results_2019.02.04_BN2820+A22+DAPI002_
+	excelpath: X:\tnw\BN\Shared\Raman\MukB_MatP data\Datasets_Raman\Overview_testruns_replidata
+
+
+code with configs, ---------------------------------------------------------------
+donut:
+initval.mainexperimentpath='L:\BN\CD\Shared\Raman van Wee L\'; 
+ExcelOverViewName='ExperimentOverview.xlsx';  
+donut: 
+	X:\tnw\BN\CD\Shared\Raman van Wee L\MatlabCodes\2017_CellDonutCode-master; 
+	config paths in 'A000__WF_Get_JacobPathsandExperiments'. Relevant lines: 
+	case 108, initval.expi='BN2820_02_04A'; 
+	epth=strcat('2019.02.04 BN2820+A22+DAPI\2019.02.04 BN2820+A22+DAPI001 (good images)',initval.DirSep,'X050_densitydata');
+    	case 109, initval.expi='BN2820_02_04B';  
+	epth=strcat('2019.02.04 BN2820+A22+DAPI\2019.02.04 BN2820+A22+DAPI002',initval.DirSep,'X050_densitydata');
+replicode: 
+	X:\tnw\BN\Shared\Raman\MukB_MatP data\Scripts\BN_CD_CellCode-master\replicode; 
+	config in ''A_User_config_Sandro_nw''
+
+issue: the final link between excel entry and data directory is 'hidden' in the matlab config file. 
+Without this file, analysis can't be reconstructed... 
+
+

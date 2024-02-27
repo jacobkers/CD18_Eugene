@@ -1,0 +1,47 @@
+fixed-roi tracker
+
+steps: 
+-In ImageJ, 
+	make a particle image (typically a MAX or AV)
+	make a background image (MIN or supersmoothened)
+-in Matlab
+	set paths in config
+	check various settings in tracker
+	run in alphabetical order
+
+refs: Jacob Kers 2023, code based on project with Adi (~2015)
+
+#analysis
+-----------------------------
+code in: analysis\CD20_Cells\topical_projects
+data in: M:\tnw\bn\cd\Shared\Tisma\Bacillus subtilis chromosome imaging\Widefield_and_deconvolution	\20230428_BSG4595_dynamics
+file organization: see data description in: A000_ConfigExp.m
+
+data names, taken at specified intervals:
+BSG4595_1s_001
+BSG4595_1s_002
+BSG4595_1s_004
+BSG4595_10s_001_series1_perframe
+BSG4595_10s_001_series2_perframe
+BSG4595_30s_001_series1_perframe
+BSG4595_30s_001_series2_perframe
+
+rationale for settings:
+spots are about 7 pixels FWHM
+cells are round and about 27 pixels in diameter
+
+after some trying:
+--> pre-smooth first image:
+1) at 1 pixels to suppress noise 
+2) at 100 pixels for background
+
+spot detection settings:
+edge=20; %spots closer to edge than this will not be analyzed
+backsquaregridsize=50; %used in background image determination
+particletreshold=2.5; %number of sigmas a local maximum needs to stick out 
+minproximity=10; %when spots are closer together than this, only the brightest one is kept
+
+%further selection:
+-we have bright 'marker spots' that lose much less their intensity than the ori spots 
+ 
+

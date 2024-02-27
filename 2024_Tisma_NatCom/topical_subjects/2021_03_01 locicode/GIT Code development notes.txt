@@ -1,0 +1,71 @@
+12-5  up to A70
+-copied all subdirs to blue-o for local work
+-A60: added raw trace save in .mat
+-A65: use to check quickly what was done
+-A70: save a mosaic of all channels, first and last frame for referral
+-A50: cropping edge check added, now works
+-note: multispot??
+
+
+10-5 run remote bulk via office pc: 
+A20 to A65, data 2.1--2.5 (drift clicked earlier)
+crash on 2.2?
+
+10-5 locii, A60: 
+-show traces per cell, save for viewing
+-use soft-edges mask blur from BF
+-experimenting with different trackers per channel
+-subtract pos color 1(=chrom) from 2, 3
+
+
+3-5 Locii tracking
+back to blue-O: works
+set up remote: laptop VPN; slow!
+work via office pc
+2.2 cell 60: check for empty centroid pos
+2.1,2.2 work
+started on A060, rewriting load format
+A60 runs complete on 2.1 local
+A65 runs complete
+--> Runshell back to live
+
+
+21-4 batch preps
+A05: clicking split off from drift correction
+
+21-4 running 2.1...2.5 bulk via office up to A050; works
+
+pushed
+21-4 loci code: add chromosome tracking
+-organize 'tools'
+-A040/50: add shortset frame option
+-A050: allow for less c channels
+-runs but not all colors...
+config, A40/50: removed references to rfp and cfp, now color 1, 2, 3 (can be empty)
+A050: changed saving to tiff stacks for handling less files
+A060 dynamics just for showing --> A070
+A060_tracking: to be worked on
+
+19-4 loci code revival II
+-A001 Set up runshell
+-A000 organize remote data: L:\tnw\BN\CD\Shared\Timo Muller\2019.12.5 - 2179 room temp
+-A010 drift correction log scale for better visibility; run it (NB very slow via laptop-remote bulk- might separate clicking from carrying out. copy local for now)
+-A20 under runshell works
+
+
+16-3-2021 revisit loci code
+Set up this document to compare this package with original FW code
+functions in '2021_03_15 chrdiffisivity':
+msdplot.m: combines lociidata and cell data to get msd's
+func_chrfinderc.m
+func_locifinder.m
+
+-march 2021 checkup:
+A010-20-30 standard preps
+A040:identifies cells via phase images, links foci images to cells
+A050:crops all channels via cell area measurements
+A060_LociiDynamics: only shows images
+A060_LociiTracing: loads images and tracks spots, no correction for cell drift; finds moive average location of single spot and then tracks variations in that box per image
+A065_LociiTraceDynamics: creates msd traces
+
+note that chromosome channel is not cropped or used

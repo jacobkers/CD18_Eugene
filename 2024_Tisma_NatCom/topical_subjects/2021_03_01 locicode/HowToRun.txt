@@ -1,0 +1,30 @@
+
+Run all via the 'Runshell'
+
+General:
+run remote with VPN or via office PC
+
+
+Drift Correct :
+ 
+-First run the A010FindDriftvector file.
+1. It will open the brightfield images of cells (change the imagepath : line10: initval.imagepath= XXX).
+2. Select 5 cells by a left mouse clicking on their centers.
+3. It will calculate the drift vector between various timepoints and save the file as a text file into the same folder.
+ 
+-Run the A020CorrectDrift file.
+1. It will create a folder with drift corrected files.
+
+-Initialize A030_Dipistart.
+
+-Run A040_Cellidentifier_LociData
+1. In order to select if the loci belongs to a single cell, left mouse click on the cell body and then right click to move to the next one.
+2. The data will be saved into a new folder in a matfile format.
+
+-Run A050_Cellcropper_Loci.
+1. Run the file to crop the selected files from the A040_Cellidentifier step. It will create time-lapse stacks with single cells with single channels
+
+-march 2021:
+A060_LociiDynamics: only shows images
+A060_LociiTracing: loads images and tracks spots, no correction for cell drift; finds moive average location of single spot and then tracks variations in that box per image
+A065_LociiTraceDynamics: creates msd traces

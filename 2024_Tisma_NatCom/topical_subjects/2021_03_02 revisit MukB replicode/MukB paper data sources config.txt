@@ -1,0 +1,139 @@
+ from 23-34, run indices identical to Raman's config, transferred by JK     
+   BN2820-Wildtype: 
+         23: 2019.01.17_BN2820+A22+42C+DAPI
+         24: 2019.02.04_BN2820+A22+DAPI001 (good images)
+         25: 2019.02.04_BN2820+A22+DAPI002
+         26: 2019.02.27_BN2820+A22+DAPI
+         30: 2019.02.27_BN2820+A22+DAPI_Tresholded_for_DNA  [1]
+         31: 2019.02.27_BN2820+A22+DAPI_Tresholded_for_foci [1]
+   BN2822-delta MatP: 
+         27: 2019.01.17_BN2822+A22+42C+DAPI.001
+         28: 2019.02.04_BN2822+A22+DAPI002
+         29: 2019.02.27_BN2822+A22+DAPI
+         32: 2019.02.27_BN2822+A22+DAPI_Tresholded_for_DNA [1]
+         33: 2019.02.27_BN2822+A22+DAPI_Tresholded_for_foci [1]
+   MukEQ strain: 
+         34: 2018_10_08_MukEQ
+
+Remarks [JK]:
+[1] [nonfunctional *] old version, only replicode output change. current version works with
+ channel-specific tresholds, so these are covered by run 26 or 29
+[2] see also notes in \2021_03_02 Revisit MukB replicode 
+
+
+
+
+CASES, please check paths!
+   case 23,    initval.expi='2019.01.17_BN2820+A22+42C+DAPI';   5-channel Mukbef with Raman
+              epth='\2820 (Wildtype, MukB-YFP)\2019.01.17 BN2820+A22+42C+DAPI\BN2820+A22+42C+DAPI.001\';
+              drivepath='O:\CD_Data_out\2016_Sandro\2018_SJ\';
+              datapth=[drivepath 'MukB-MatP paper\MukB raw data\BN2820-Wildtype\'];
+              initval.pth_crop=[datapth 'Crop Code output\BN2820+42C+DAPI\'];
+              initval.pth_donut=[datapth 'Donut Code output\Results_BN2820+42C+DAPI_Rfp_SingleBranch_NoFlip\'];              
+              initval.pth_repli=[datapth 'Repli Code output\BN2820+42C+DAPI\'];
+              initval.pth_excelfile=[drivepath 'Overview_testruns_replidata_JK_merged22.xlsx'];
+              initval.channelorder=2;
+              initval.numberofchannels=5;
+              tresholds,comment out to use auto
+              channels [WF DNA;Ori Ter MukB]
+              initval.tresholdperchannel=[NaN 0.1 0.7 0.7 0.7];   
+   case 24,    initval.expi='2019.02.04_BN2820+A22+DAPI001';   5-channel Mukbef with Raman
+               epth='\2820 (Wildtype, MukB-YFP)\2019.02.04 BN2820+A22+DAPI001 (good images)\'; 
+              drivepath='O:\CD_Data_out\2016_Sandro\2018_SJ\';
+              datapth=[drivepath 'MukB-MatP paper\MukB raw data\BN2820-Wildtype\'];
+              initval.pth_crop=[datapth 'Crop Code output\BN2820+A22+DAPI001 (good images)\'];
+              initval.pth_donut=[datapth 'Donut Code output\Results_BN2820+DAPI001_Rfp_SingleBranch_NoFlip\'];              
+              initval.pth_repli=[datapth 'Repli Code output\BN2820+A22+DAPI001 (good images)\'];
+              initval.pth_excelfile=[drivepath 'Overview_testruns_replidata_JK_merged22.xlsx'];
+              initval.channelorder=2;
+              initval.numberofchannels=5;
+              tresholds,comment out to use auto
+              channels [WF DNA;Ori Ter MukB]
+              initval.tresholdperchannel=[NaN 0.1 0.7 0.7 0.7];
+
+   case 25    ori path Raman_25:
+              epth='\2820 (Wildtype, MukB-YFP)\2019.02.04 BN2820+A22+DAPI002\' 
+              drivepath='O:\CD_Data_out\2016_Sandro\2018_SJ\';
+              datapth=[drivepath 'MukB-MatP paper\MukB raw data\BN2820-Wildtype\'];
+              initval.expi='2019.02.04_BN2820+A22+DAPI002'; 
+              initval.pth_crop=[datapth 'Crop Code output\BN2820+A22+DAPI002\'];
+              initval.pth_donut=[datapth 'Donut Code output\Results_BN2820+DAPI002_Rfp_SingleBranch_NoFlip\'];              
+              initval.pth_repli=[datapth 'Repli Code output\BN2820+A22+DAPI002\'];
+              initval.pth_excelfile=[drivepath 'Overview_testruns_replidata_JK_merged22.xlsx'];
+              initval.channelorder=2;
+              initval.numberofchannels=5;
+              comment out to use auto_treshold:
+              initval.tresholdperchannel=[NaN 0.1 0.7 0.7 0.7];  [WF DNA;Ori Ter MukB] 
+    case 26,  initval.expi='2019.02.27_BN2820+A22+DAPI';   
+              epth='\2820 (Wildtype, MukB-YFP)\2019.02.27 BN2820+A22+DAPI\2019.02.27 BN2820+A22+DAPI\';
+              drivepath='O:\CD_Data_out\2016_Sandro\2018_SJ\';
+              datapth=[drivepath 'MukB-MatP paper\MukB raw data\BN2820-Wildtype\'];
+              initval.pth_crop=[datapth 'Crop Code output\BN2820+A22+DAPI\'];
+              initval.pth_donut=[datapth 'Donut Code output\Results_BN2820+DAPI_Rfp_SingleBranch_NoFlip\'];              
+              initval.pth_repli=[datapth 'Repli Code output\BN2820+A22+DAPI\'];
+              initval.pth_excelfile=[drivepath 'Overview_testruns_replidata_JK_merged22.xlsx'];
+              initval.channelorder=2;
+              initval.numberofchannels=5;
+              comment out to use auto_treshold:
+              initval.tresholdperchannel=[NaN 0.1 0.7 0.7 0.7];  [WF DNA;Ori Ter MukB]
+    case 27,  initval.expi='2019.01.17_BN2822+A22+42C+DAPI.001';   
+              epth='\2822 (Delta MatP, MukB-YFP)\2019.01.17\BN2822+A22+42C+DAPI.001\';
+              drivepath='O:\CD_Data_out\2016_Sandro\2018_SJ\';
+              datapth=[drivepath 'MukB-MatP paper\MukB raw data\BN2822-delta MatP\'];
+              initval.pth_crop=[datapth 'Crop Code output\BN2822+A22+DAPI\'];
+              initval.pth_donut=[datapth 'Donut Code output\Results_A22+DAPI_Rfp_SingleBranch_NoFlip\'];              
+              initval.pth_repli=[datapth 'Repli Code output\BN2822+A22+DAPI\'];
+              initval.pth_excelfile=[drivepath 'Overview_testruns_replidata_JK_merged22.xlsx'];
+              initval.channelorder=2;
+              initval.numberofchannels=5;
+              tresholds,comment out to use auto
+              channels [WF DNA;Ori Ter MukB]
+              initval.tresholdperchannel=[NaN 0.1 0.7 0.7 0.7]; 
+    case 28 ori path Raman_28:            
+              epth='\2822 (Delta MatP, MukB-YFP)\2019.02.04 BN2822+A22+DAPI002\';              
+              drivepath='O:\CD_Data_out\2016_Sandro\2018_SJ\';
+              datapth=[drivepath 'MukB-MatP paper\MukB raw data\BN2822-delta MatP\'];
+              initval.expi='2019.02.04_BN2822+A22+DAPI002'; 
+              initval.pth_crop=[datapth 'Crop code output\BN2822+A22+DAPI002\'];
+              initval.pth_donut=[datapth 'Donut Code output\Results_A22+DAPI002_Rfp_SingleBranch_NoFlip\'];              
+              initval.pth_repli=[datapth 'Repli Code output\BN2822+A22+DAPI002\'];
+              initval.pth_excelfile=[drivepath 'Overview_testruns_replidata_JK_merged22.xlsx'];
+              initval.channelorder=2;
+              initval.numberofchannels=5;
+              comment out to use auto_treshold:
+              initval.tresholdperchannel=[NaN 0.1 0.7 0.7 0.7];  [WF DNA;Ori Ter MukB] 
+    case 29,  initval.expi='2019.02.27_BN2822+A22+DAPI';   5-channel Mukbef with Raman
+              epth='\2822 (Delta MatP, MukB-YFP)\2019.02.27 BN2822+A22+DAPI\2019.02.27 BN2822+A22+DAPI\';
+               drivepath='O:\CD_Data_out\2016_Sandro\2018_SJ\';
+              datapth=[drivepath 'MukB-MatP paper\MukB raw data\BN2822-delta MatP\'];
+              initval.pth_crop=[datapth 'Crop Code output\BN2822\'];
+              initval.pth_donut=[datapth 'Donut Code output\Results_BN2822_Rfp_SingleBranch_NoFlip\'];              
+              initval.pth_repli=[datapth 'Repli Code output\BN2822\'];
+              initval.pth_excelfile=[drivepath 'Overview_testruns_replidata_JK_merged22.xlsx'];
+              initval.channelorder=2;
+              initval.numberofchannels=5;
+              tresholds,comment out to use auto
+              channels [WF DNA;Ori Ter MukB]
+              initval.tresholdperchannel=[NaN 0.1 0.7 0.7 0.7]; 
+    case 30,    initval.expi='2019.02.27_BN2820+A22+DAPI_Tresholded_for_DNA';   5-channel Mukbef with Raman
+                epth='\2820 (Wildtype, MukB-YFP)\2019.02.27 BN2820+A22+DAPI\2019.02.27 BN2820+A22+DAPI\';                                
+    case 31,    initval.expi='2019.02.27_BN2820+A22+DAPI_Tresholded_for_foci';   5-channel Mukbef with Raman
+                epth='\2820 (Wildtype, MukB-YFP)\2019.02.27 BN2820+A22+DAPI\2019.02.27 BN2820+A22+DAPI\';                                
+    case 32,    initval.expi='2019.02.27_BN2822+A22+DAPI_Tresholded_for_DNA';   5-channel Mukbef with Raman
+                epth='\2822 (Delta MatP, MukB-YFP)\2019.02.27 BN2822+A22+DAPI\2019.02.27 BN2822+A22+DAPI\';                
+    case 33,    initval.expi='2019.02.27_BN2822+A22+DAPI_Tresholded_for_foci';   5-channel Mukbef with Raman
+                epth='\2822 (Delta MatP, MukB-YFP)\2019.02.27 BN2822+A22+DAPI\2019.02.27 BN2822+A22+DAPI\';                
+    case 34,    initval.expi='2018_10_08_MukEQ';   5-channel Mukbef with Raman
+                epth='\MukEQ\2018_10_08_MukEQ\MukEQ+DAPI.001\';
+                drivepath='O:\CD_Data_out\2016_Sandro\2018_SJ\';
+              datapth=[drivepath 'MukB-MatP paper\MukB raw data\MukEQ strain\'];
+              initval.pth_crop=[datapth 'Crop Code output\2018_10_08_MukEQ\'];
+              initval.pth_donut=[datapth 'Donut Code output\Results_MukEQ_Rfp_SingleBranch_NoFlip\'];              
+              initval.pth_repli=[datapth 'Repli Code output\2018_10_08_MukEQ\'];
+              initval.pth_excelfile=[drivepath 'Overview_testruns_replidata_JK_merged22.xlsx'];
+              initval.channelorder=2;
+              initval.numberofchannels=5;
+              tresholds,comment out to use auto
+              channels [WF DNA;Ori Ter MukB]
+              initval.tresholdperchannel=[NaN 0.1 0.7 0.7 0.7]; 
+end

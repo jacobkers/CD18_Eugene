@@ -1,0 +1,15 @@
+source data:
+M:\tnw\bn\cd\Shared\Tisma\Bacillus subtilis chromosome imaging\Widefield_and_deconvolution\20221128_BSG217\Selected planes
+
+actions:
+* drag to workspace: BSG217_stack_Outlines_Corr_ObjDetection.mat
+* or: load('BSG217_stack_Outlines_Corr_ObjDetection.mat')
+* run: CellParametersExtract_jk.m
+        - plots DNA and cell contours, rotated horizontally on long axis. 
+	- cells will only be plotted in free area
+	- numbers per quadrant are kept
+	- execution takes some time
+
+
+to view: open: cellList - meshdata: data from three frames (different xy)
+per cell: objects -outlines lists xy data

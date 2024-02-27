@@ -1,0 +1,11 @@
+tiff link:
+BSG217_002xy1c2_cmle-1.tif = 1
+BSG219_45min_Xyl_001xy1c2_cmle-1.tif = 2 
+BSG219_noXyl_001xy1c2_cmle-1.tif = 3
+BSG219_90min_Xyl_001xy1c2_cmle-1.tif = 4
+
+tiff-source-conditions:
+1=BSG217_002xy1c2_cmle-1 = -TEV tag, +Xylose
+3=BSG219_noXyl_001xy1c2_cmle-1 = +TEV tag, -Xylose
+2=BSG219_45min_Xyl_001xy1c2_cmle-1 = +TEV tag, +Xylose, 45 mins
+4=BSG219_90min_Xyl_001xy1c2_cmle-1 = +TEV tag, +Xylose, 90 mins
