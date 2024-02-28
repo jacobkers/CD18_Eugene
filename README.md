@@ -17,12 +17,14 @@ For some work, an earlier repository may exist that was referenced in the public
 Independent publication-related repositories are listed below.
 
 ## references and links to publicly accessible (co-)developed code and data
+
 Github:
 * 2021_Loeff_Patterns : https://github.com/jacobkers/Loeff-Kerssemakers-et-al-AutoStepFinder
 * 2022_Meindlhumer_Front_Phys : https://github.com/M-Sabrina/MinDE_analysis_2022
+
 Zenodo:
 * 2024 Tisma_NatCom: https://zenodo.org/records/7733856
-* 2024_Davison_Nature: https://zenodo.org/records/7409240
+* 2024_Davidson_Nature: https://zenodo.org/records/7409240
 * 2021 Brauns_Natcom: https://zenodo.org/records/4637889
 * 2021_Loeff_Patterns: https://zenodo.org/records/7920072
 
